@@ -1,0 +1,21 @@
+.mainWatchlistContent{
+    min-height: 70vh;
+    max-width: 1000px;
+    margin: 0 auto 0 auto;
+}
+
+.addWatchlistButton{
+    margin-top: 40px;
+}
+
+.addWatchlistButton > button{
+    font-weight: bold;
+    font-size: xx-large;
+    padding: 6px 16px 6px 16px;
+    border-radius: 250px;
+}
+
+.addWatchlistButton > span{
+    font-size: x-large;
+    margin-left: 15px;
+}

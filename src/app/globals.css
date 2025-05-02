@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+:root {
+    --font: "Lexend", Arial
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font);
+    font-weight: 600;
+}
+
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body{
+    font-family: var(--font);
+    max-width: 1200px;
+    margin: 0 auto 0 auto;
+}
+
+#logo{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+a{
+    color: black;
+}
+
+#profile-nav{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+footer > ul {
+    display: flex;
+    gap: 20px;
+    justify-self: center;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.modal-background{
+    position:fixed;
+    background-color: rgba(0, 0, 0, 0.39);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal{
+    width: fit-content;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 25px;
+}
