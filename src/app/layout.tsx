@@ -1,7 +1,15 @@
-import Image from 'next/image';
-import './globals.css';
+"use client"
 
-export default function RootLayout({children}:{children: React.ReactNode}) {
+import Footer from './components/Footer';
+import Header from './components/Header';
+import './globals.css';
+import {ReactNode, createContext} from 'react';
+import { AuthProvider } from './context/AuthContext';
+
+const AuthContext = createContext(null);
+
+
+export default function RootLayout({children}:{children: ReactNode}) {
   return (
     <html lang="en">
       <head>
@@ -12,39 +20,13 @@ export default function RootLayout({children}:{children: React.ReactNode}) {
         />
       </head>
       <body>
-        <header>
-          <div>
-            <div id="logo">
-              <h1>GroupWatchlist</h1>
-              <Image
-                src='/movie-film-roll-for-movie.svg'
-                width={50}
-                height={50}
-                alt=""
-              />
-            </div>
-          </div>
+        <AuthProvider>
+          <Header/>
 
-          <div id="profile-nav">
-            <Image
-              src='/profile-round-1342.svg'
-              width={25}
-              height={25}
-              alt=""
-            />
-            <a href="">Sign up / Log in</a>
-          </div>
-        </header>
+          {children}
 
-        {children}
-
-        <footer>
-          <ul>
-            <li><a href="">Report an Issue</a></li>
-            <li><a href="">About Me</a></li>
-            <li><a href="">About GroupWatchlist</a></li>
-          </ul>
-        </footer>
+          <Footer/>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,0 +1,21 @@
+[debug] [2025-05-06T20:36:01.761Z] ----------------------------------------------------------------------
+[debug] [2025-05-06T20:36:01.763Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jcand\OneDrive\Documents\code\group-watchlist\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-05-06T20:36:01.763Z] CLI Version:   14.2.2
+[debug] [2025-05-06T20:36:01.764Z] Platform:      win32
+[debug] [2025-05-06T20:36:01.764Z] Node Version:  v20.17.0
+[debug] [2025-05-06T20:36:01.764Z] Time:          Tue May 06 2025 14:36:01 GMT-0600 (Mountain Daylight Time)
+[debug] [2025-05-06T20:36:01.764Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-06T20:36:01.769Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-06T20:36:01.769Z] > authorizing via signed-in user (jcandrus02@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\jcand\OneDrive\Documents\code\group-watchlist
+

@@ -10,12 +10,81 @@
 
 .addWatchlistButton > button{
     font-weight: bold;
-    font-size: xx-large;
-    padding: 6px 16px 6px 16px;
+    padding: 10px;
+    height: 40px;
+    width: 40px;
     border-radius: 250px;
+    width: fit-content;
+    height: fit-content;
 }
 
 .addWatchlistButton > span{
     font-size: x-large;
     margin-left: 15px;
+}
+
+.watchlistItems{
+    max-width: 800px;
+    margin: auto;
+}
+
+.upVoted{
+    background-color: green;
+}
+
+.downVoted{
+    background-color: red;
+}
+
+.votebuttons{
+    display: inline;
+    margin: 0 10px 0 10px;
+}
+
+.watchlistItem {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin: 15px 0 15px 0;
+    max-width: 100%;
+    border: solid;
+    border-color: transparent;
+    border-width: 2px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.watchlistItem:hover {
+    border-color: rgb(173, 173, 173);
+}
+
+.checkedItem{
+    color: rgb(156, 156, 156);
+}
+
+.watchlistTitle{
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.voteCounter{
+    width: 25px;
+    text-align: center;
+    display: inline-block;
+}
+
+.accordianDropdown{
+    margin-left: 35px;
+    color: rgb(90, 90, 90);
+}
+
+.watchlistCard{
+    display: flex;
+    justify-content: space-between;
+    border: black solid 2px;
+    margin: 10px;
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.274);
+    padding: 25px;
 }

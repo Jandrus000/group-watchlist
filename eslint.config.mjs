@@ -10,7 +10,25 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  /* Next.js defaults you already had                         */
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  /* ------------------------------------------------------- */
+  /*  YOUR additional rules / overrides go here              */
+  {
+    files: ["**/*.ts", "**/*.tsx"],   // only TS files (optional)
+    rules: {
+      /**
+       * Ignore *unused* function / catch parameters
+       * **whose name starts with an underscore** (`_`).
+       */
+      "@typescript-eslint/no-unused-vars": [
+        "off",
+        { "argsIgnorePattern": "^_" }
+      ],
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  }
 ];
 
 export default eslintConfig;

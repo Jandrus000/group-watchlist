@@ -48,3 +48,38 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [sharing]()
 - [filtering]()
 
+### Data structure
+```
+users/{userId}
+{
+  username: string,
+  createdAt: Timestamp
+}
+
+watchlists/{watchlistId}
+{
+  userId: "abc123",
+  name: "Favorites",
+  createdAt: Timestamp
+}
+
+watchlistMovies/{entryId}
+{
+  watchlistId: "xyz456",
+  movieId: "movie789",
+  addedAt: Timestamp
+}
+
+movies/{movieId}
+{
+  title: "Inception",
+  genres: ["Sci-Fi", "Thriller"],
+  imdbLink: "https://imdb.com/title/tt1375666/",
+  director: "Christopher Nolan",
+  releaseYear: 2010,
+  lengthMinutes: 148,
+  upvoteCount: 4523
+  watched: boolean
+}
+```
+

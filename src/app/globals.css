@@ -64,3 +64,14 @@ footer > ul {
     padding: 2rem;
     border-radius: 25px;
 }
+
+button {
+    font-family: var(--font);
+    background-color: white;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.bold{
+    font-weight: bold;
+}
