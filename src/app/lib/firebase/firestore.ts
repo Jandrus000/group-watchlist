@@ -53,7 +53,7 @@ export async function addUserGoogle(user_name: string | null, userId: string) {
 
 export async function addWatchlist(
     _name: string,
-    _userId: string | null,
+    _userId: string,
     _description: string
 ) {
     try {
@@ -198,7 +198,7 @@ export async function handleVote(
 
         if (!voteDoc.exists()) {
             // No existing vote; add new vote
-            transaction.set(voteRef, { userId, vote: voteValue });
+            transaction.set(voteRef, { userId, vote: voteValue, itemId: itemId });
             voteChange = voteValue;
         } else {
             const existingVote = voteDoc.data().vote;
@@ -215,6 +215,7 @@ export async function handleVote(
 
         transaction.update(itemRef, {
             upVotes: increment(voteChange),
+            updatedAt: serverTimestamp()
         });
     });
 }
@@ -225,7 +226,9 @@ export async function updateWatchState(watchListId: string, itemId:string, watch
     console.dir(snapShot.data())
     try{
         await updateDoc(itemRef, {
-            watched: watchedState
+            watched: watchedState,
+            updatedAt: serverTimestamp(),
+
         })
     } catch(error){
         console.error(error)
@@ -245,10 +248,20 @@ export async function deleteItem(item: Items){
 }
 
 export async function deleteWatchlist(watchlist: Watchlist){
-    const docRef = doc(db, 'watchlists', watchlist.id)
-    console.log('im here')
+    const itemsDocRef = collection(db, 'watchlists', watchlist.id, 'items')
+    const itemsSnapshot = await getDocs(itemsDocRef)
     try{
-        await deleteDoc(docRef);
+        for (const itemDoc of itemsSnapshot.docs) {
+            const itemId = itemDoc.id;
+            const votesCollectionRef = collection(db, 'watchlists', watchlist.id, 'items', itemId, 'votes')
+            const votesSnapshot = await getDocs(votesCollectionRef);
+
+            const voteDeletes = votesSnapshot.docs.map((voteDoc) => deleteDoc(voteDoc.ref));
+            await Promise.all(voteDeletes);
+
+            await deleteDoc(itemDoc.ref)
+        }
+        await deleteDoc(doc(db,'watchlists', watchlist.id));
     }catch(e){
         console.error(e)
     }

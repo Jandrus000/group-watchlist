@@ -1,0 +1,111 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {	
+
+    // ----- USERS COLLECTION -----
+    match /users/{userId}{
+      allow create: if request.auth.uid == userId;
+      allow read: if false;
+      allow update: if request.auth.uid == userId &&
+      request.resource.data.username is string &&
+      request.resource.data.username.size() <= 50;
+      allow delete: if false; // no deletion of user allowed for not
+
+      // field validation
+      allow write: if request.resource.data.keys().hasOnly(['username', 'createdAt']) &&
+      request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // ----- WATCHLISTS COLLECTION -----
+    match /watchlists/{watchlistId} {
+      allow create: if request.auth.uid != null &&
+      request.resource.data.userId == request.auth.uid &&
+      request.resource.data.name is string &&
+      request.resource.data.name != "" &&
+      request.resource.data.name.size() <= 100 &&
+      request.resource.data.description is string &&
+      request.resource.data.description.size() <= 500 &&
+      request.resource.data.createdAt == request.time &&
+      request.resource.data.keys().hasOnly(['name', 'description', 'userId', 'createdAt']);
+
+      allow read: if true
+
+      allow update: if request.auth.uid == resource.data.userId &&
+      request.resource.data.name.size() <= 100 &&
+      request.resource.data.description.size() <= 500 &&
+      request.resource.data.userId == resource.data.userId &&
+      request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if request.auth.uid == resource.data.userId;
+
+      // ----- ITEMS SUBCOLLECTION -----
+      match /items/{itemId} {
+        allow create: if request.auth != null && 
+        request.resource.data.keys().hasOnly([
+        'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
+        'createdBy', 'watchListId', 'createdAt', 'upVotes'
+        ]) &&
+        request.resource.data.watchListId == watchlistId &&
+        request.resource.data.title is string &&
+        request.resource.data.title != "" &&
+        (request.resource.data.length == null || request.resource.data.length <= 99999) &&
+        request.resource.data.description.size() <= 500 &&
+        request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.updatedAt == request.time &&
+        (request.resource.data.upVotes == 0 || request.resource.data.upVotes == null) &&
+        (!('year' in request.resource.data) || 
+        (request.resource.data.year == null || 
+        (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)));
+
+        allow read: if true; // Anyone can read items
+
+        allow update: if request.auth != null && 
+        request.resource.data.keys().hasOnly([
+        'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
+        'createdBy', 'watchListId', 'createdAt', 'upVotes'
+        ]) &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.createdBy == resource.data.createdBy &&
+        request.resource.data.watchListId == resource.data.watchListId &&
+        request.resource.data.title is string &&
+        request.resource.data.title != "" &&
+        (request.resource.data.length == null || request.resource.data.length <= 99999) &&
+        request.resource.data.description.size() <= 500 &&
+        request.resource.data.updatedAt == request.time &&
+        (!('year' in request.resource.data) || 
+        (request.resource.data.year == null || 
+        (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)));
+
+        allow delete: if request.auth != null; // Anyone signed-in can delete items
+
+        // ----- VOTES SUBCOLLECTION -----
+        match /votes/{voteId} {
+          allow create: if request.auth.uid == request.resource.data.userId &&
+          request.auth.uid == voteId &&
+          request.resource.data.itemId == itemId &&
+          (request.resource.data.vote == 1 || request.resource.data.vote == -1) &&
+          request.resource.data.keys().hasOnly(['userId', 'vote', 'itemId']);
+
+          allow read: if true; // Anyone can read votes
+
+          allow update: if request.auth.uid == resource.data.userId &&
+          // request.auth.uid == voteId &&
+          request.resource.data.itemId == itemId &&
+          request.resource.data.userId == resource.data.userId &&
+          (request.resource.data.vote == 1 || request.resource.data.vote == -1)&&
+          request.resource.data.keys().hasOnly(['userId', 'vote', 'itemId']);
+
+          allow delete: if request.auth != null;
+
+        }
+      }
+    }
+
+    // Catch-all: Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

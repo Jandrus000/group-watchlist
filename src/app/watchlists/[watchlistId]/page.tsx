@@ -2,11 +2,7 @@ import {notFound} from 'next/navigation'
 import { getWatchlistDoc } from '@/app/lib/firebase/firestore';
 import Watchlist from '../../components/Watchlist'
 
-interface WatchlistPageProps{
-    params: {watchlistId: string};
-}
-
-export default async function WatchlistPage({params} : WatchlistPageProps){
+export default async function WatchlistPage({ params }: {params: Promise<{watchlistId: string}>}) {
     const {watchlistId} = await params;
     const watchlistDoc = await getWatchlistDoc(watchlistId)
 
