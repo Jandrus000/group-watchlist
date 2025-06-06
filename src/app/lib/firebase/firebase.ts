@@ -4,7 +4,7 @@ import { initializeApp } from "firebase/app";
 import {getAuth, connectAuthEmulator} from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
-const ApiKey = process.env.NEXT_PUBLIC_API_KEY
+// const ApiKey = process.env.NEXT_PUBLIC_API_KEY
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -12,7 +12,7 @@ const ApiKey = process.env.NEXT_PUBLIC_API_KEY
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: ApiKey,
+  apiKey: "AIzaSyDEVdtAWCNSPCBKZjCl9Dm8Qe6Xa-VyzBc",
   authDomain: "group-watchlist.firebaseapp.com",
   projectId: "group-watchlist",
   storageBucket: "group-watchlist.firebasestorage.app",
