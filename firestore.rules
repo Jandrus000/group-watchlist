@@ -1,16 +1,16 @@
 rules_version = '2';
 
 service cloud.firestore {
-  match /databases/{database}/documents {	
+  match /databases/{database}/documents {
 
     // ----- USERS COLLECTION -----
-    match /users/{userId}{
+    match /users/{userId} {
       allow create: if request.auth.uid == userId;
-      allow read: if false;
+      allow read: if request.auth.uid != null;
       allow update: if request.auth.uid == userId &&
       request.resource.data.username is string &&
       request.resource.data.username.size() <= 50;
-      allow delete: if false; // no deletion of user allowed for not
+      allow delete: if false; // no deletion of user allowed
 
       // field validation
       allow write: if request.resource.data.keys().hasOnly(['username', 'createdAt']) &&
@@ -27,15 +27,21 @@ service cloud.firestore {
       request.resource.data.description is string &&
       request.resource.data.description.size() <= 500 &&
       request.resource.data.createdAt == request.time &&
-      request.resource.data.keys().hasOnly(['name', 'description', 'userId', 'createdAt']);
+      request.resource.data.keys().hasOnly(['name', 'description', 'userId', 'createdAt', 'tags']);
 
-      allow read: if true
+      allow read: if true;
 
-      allow update: if request.auth.uid == resource.data.userId &&
+      allow update: if (
+      request.auth.uid == resource.data.userId &&
       request.resource.data.name.size() <= 100 &&
       request.resource.data.description.size() <= 500 &&
       request.resource.data.userId == resource.data.userId &&
-      request.resource.data.createdAt == resource.data.createdAt;
+      request.resource.data.createdAt == resource.data.createdAt
+      ) || (
+      request.resource.data.keys().hasOnly(['tags']) && 
+      request.resource.data.tags is map &&
+      request.auth != null
+      );
 
       allow delete: if request.auth.uid == resource.data.userId;
 
@@ -44,7 +50,7 @@ service cloud.firestore {
         allow create: if request.auth != null && 
         request.resource.data.keys().hasOnly([
         'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
-        'createdBy', 'watchListId', 'createdAt', 'upVotes'
+        'createdBy', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags'
         ]) &&
         request.resource.data.watchListId == watchlistId &&
         request.resource.data.title is string &&
@@ -53,33 +59,43 @@ service cloud.firestore {
         request.resource.data.description.size() <= 500 &&
         request.resource.data.createdBy == request.auth.uid &&
         request.resource.data.createdAt == request.time &&
+        (request.resource.data.genres is list || request.resource.data.genres == null) &&
+        (request.resource.data.genres.hasOnly([
+        'Action', 'Adventure', 'Anthology', 'Animation', 'Anime', 'Biographical', 'Children', 'Comedy', 'Coming of Age', 'Computer Animation', 'Crime', 'Cyberpunk', 'Dance', 'Dark Comedy', 'Disaster', 'Documentary', 'Drama', 'Dystopian', 'Educational', 'Esports', 'Experimental', 'Family', 'Fantasy', 'Food', 'Game Show', 'Harem', 'Heist', 'Historical', 'Horror', 'Isekai', 'Legal', 'Live Action', 'Martial Arts', 'Mecha', 'Medical', 'Mockumentary', 'Music', 'Musical', 'Mystery', 'Mythology', 'Nature', 'Noir', 'Parody', 'Period Drama', 'Political', 'Post-Apocalyptic', 'Psychological', 'Reality TV', 'Road Movie', 'Romance', 'Romantic Comedy', 'Samurai', 'Satire', 'School', 'Science Fiction', 'Short', 'Slice of Life', 'Soap', 'Space Opera', 'Sports', 'Spy', 'Stand-Up', 'Steampunk', 'Superhero', 'Supernatural', 'Suspense', 'Talk Show', 'Thriller', 'Time Travel', 'TV Movie', 'Urban', 'Variety Show', 'Vampire', 'War', 'Western', 'Whodunit', 'Zombie'
+        ]) || request.resource.data.genres == null) &&
         request.resource.data.updatedAt == request.time &&
         (request.resource.data.upVotes == 0 || request.resource.data.upVotes == null) &&
-        (!('year' in request.resource.data) || 
-        (request.resource.data.year == null || 
-        (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)));
+        (
+        !('year' in request.resource.data) || 
+        (request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100))
+        );
 
         allow read: if true; // Anyone can read items
 
         allow update: if request.auth != null && 
         request.resource.data.keys().hasOnly([
         'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
-        'createdBy', 'watchListId', 'createdAt', 'upVotes'
+        'createdBy', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags'
         ]) &&
         request.resource.data.createdAt == resource.data.createdAt &&
         request.resource.data.createdBy == resource.data.createdBy &&
         request.resource.data.watchListId == resource.data.watchListId &&
         request.resource.data.title is string &&
         request.resource.data.title != "" &&
+        (request.resource.data.genres is list || request.resource.data.genres == null) &&
+        (request.resource.data.genres.hasOnly([
+        'Action', 'Adventure', 'Anthology', 'Animation', 'Anime', 'Biographical', 'Children', 'Comedy', 'Coming of Age', 'Computer Animation', 'Crime', 'Cyberpunk', 'Dance', 'Dark Comedy', 'Disaster', 'Documentary', 'Drama', 'Dystopian', 'Educational', 'Esports', 'Experimental', 'Family', 'Fantasy', 'Food', 'Game Show', 'Harem', 'Heist', 'Historical', 'Horror', 'Isekai', 'Legal', 'Live Action', 'Martial Arts', 'Mecha', 'Medical', 'Mockumentary', 'Music', 'Musical', 'Mystery', 'Mythology', 'Nature', 'Noir', 'Parody', 'Period Drama', 'Political', 'Post-Apocalyptic', 'Psychological', 'Reality TV', 'Road Movie', 'Romance', 'Romantic Comedy', 'Samurai', 'Satire', 'School', 'Science Fiction', 'Short', 'Slice of Life', 'Soap', 'Space Opera', 'Sports', 'Spy', 'Stand-Up', 'Steampunk', 'Superhero', 'Supernatural', 'Suspense', 'Talk Show', 'Thriller', 'Time Travel', 'TV Movie', 'Urban', 'Variety Show', 'Vampire', 'War', 'Western', 'Whodunit', 'Zombie'
+        ]) || request.resource.data.genres == null) &&
+        (request.resource.data.tags is list || request.resource.data.tags == null) &&
         (request.resource.data.length == null || request.resource.data.length <= 99999) &&
         request.resource.data.description.size() <= 500 &&
         request.resource.data.updatedAt == request.time &&
-        (!('year' in request.resource.data) || 
-        (request.resource.data.year == null || 
-        (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)));
+        (
+        !('year' in request.resource.data) || 
+        (request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100))
+        );
 
         allow delete: if request.auth != null; // Anyone signed-in can delete items
-
         // ----- VOTES SUBCOLLECTION -----
         match /votes/{voteId} {
           allow create: if request.auth.uid == request.resource.data.userId &&
@@ -91,16 +107,15 @@ service cloud.firestore {
           allow read: if true; // Anyone can read votes
 
           allow update: if request.auth.uid == resource.data.userId &&
-          // request.auth.uid == voteId &&
           request.resource.data.itemId == itemId &&
           request.resource.data.userId == resource.data.userId &&
-          (request.resource.data.vote == 1 || request.resource.data.vote == -1)&&
+          (request.resource.data.vote == 1 || request.resource.data.vote == -1) &&
           request.resource.data.keys().hasOnly(['userId', 'vote', 'itemId']);
 
           allow delete: if request.auth != null;
-
         }
       }
+
     }
 
     // Catch-all: Deny everything else

@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import AuthLink from "./AuthLink"
 import Link from "next/link"

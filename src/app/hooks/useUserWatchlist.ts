@@ -4,26 +4,27 @@ import { addWatchlist, getUserWatchlists } from '../lib/firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
 
 export type Watchlist = {
-	id: string;
-	name: string;
-	userId: string;
-	description: string;
-	createdAt: Timestamp;
+    id: string;
+    name: string;
+    userId: string;
+    description: string;
+    createdAt: Timestamp;
+    tags: { tagIndex: number; name: string };
 };
 
 export function useUserWatchlist(user: User | null) {
-	const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
-	const [loading, setLoading] = useState(true);
+    const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
+    const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const data = await getUserWatchlists(user);
-			setWatchlists(data as Watchlist[]);
-			setLoading(false);
-		};
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getUserWatchlists(user);
+            setWatchlists(data as Watchlist[]);
+            setLoading(false);
+        };
 
-		fetchData();
-	}, [user]);
+        fetchData();
+    }, [user]);
 
     const handleAddWatchlist = async (name: string, description: string) => {
         if (!user) return;
@@ -37,6 +38,6 @@ export function useUserWatchlist(user: User | null) {
     return {
         watchlists,
         loading,
-        addWatchlist: handleAddWatchlist
-    }
+        addWatchlist: handleAddWatchlist,
+    };
 }

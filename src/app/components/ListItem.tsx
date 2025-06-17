@@ -1,10 +1,12 @@
+"use client"
+
 import { Items } from '../hooks/useWatchlistItems';
 import styles from '../page.module.css';
 import VoteButtons from './VoteButtons';
 import CheckBox from './CheckBox';
 import { useState } from 'react';
 import Image from 'next/image';
-import { deleteItem } from '../lib/firebase/firestore';
+import { decrementTag, deleteItem } from '../lib/firebase/firestore';
 
 export default function ListItem({
     item,
@@ -18,9 +20,16 @@ export default function ListItem({
     watched: boolean;
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [editMode, setIsEditMode] = useState(false);
 
-    function handleDelete(){
+    async function handleDelete() {
+        const tags = item.tags
         deleteItem(item);
+        if(tags){
+            for (const tag of tags){
+                await decrementTag(item.watchListId, tag)
+            }
+        }
     }
 
     return (
@@ -49,54 +58,93 @@ export default function ListItem({
                 </span>
             </div>
 
-            {isOpen && (
-                <div
-                    className={`${styles.accordianDropdown} ${
-                        watched && styles.checkedItem
-                    }`}
-                >   
-                    {item.description !== '' && (
+            {isOpen &&
+                (editMode ? (
+                    <form>
+                        
+                    </form>
+                ) : (
+                    <div
+                        className={`${styles.accordianDropdown} ${
+                            watched && styles.checkedItem
+                        }`}
+                    >
+                        {item.description !== '' && (
+                            <>
+                                <span className="bold">Description</span>
+                                <p>{item.description}</p>
+                            </>
+                        )}
+
+                        {item.length && (
+                            <div>
+                                <span className="bold">
+                                    Length (in mintues)
+                                </span>
+                                <span>{item.length}</span>
+                            </div>
+                        )}
+
+                        {item.year && (
+                            <div>
+                                <span className="bold">Release Year</span>
+                                <span>{item.year}</span>
+                            </div>
+                        )}
+
+                        
+                        { item.genres && item.genres.length > 0 &&
                         <>
-                            <span className="bold">Description</span>
-                            <p>{item.description}</p>
+                            <span className="bold">Genre</span>
+                            {item.genres?.map((genre: string, i:number) => 
+                                <span key={i}>{genre}</span>
+                            )}
                         </>
-                    )}
+                        }
 
-                    {item.length && (
-                        <div>
-                            <span className="bold">Length (in mintues)</span>
-                            <span>{item.length}</span>
-                        </div>
-                    )}
+                        
+                        {
+                            item.tags && item.tags.length > 0 &&
+                            (
+                                <>
+                                    <span className="bold">Tags</span>
+                                    {item.tags?.map((tag: string, i:number) => 
+                                        <span key={i}>{tag}</span>
+                                    )}
+                                </>
+                            )
+                        }
 
-                    {item.year && (
-                        <div>
-                            <span className="bold">Release Year</span>
-                            <span>{item.year}</span>
-                        </div>
-                    )}
+                        {item.imdbLink !== '' && (
+                            <div>
+                                <a href={item.imdbLink} target="_blank">
+                                    <Image
+                                        src={'/imdb-svgrepo-com.svg'}
+                                        alt="IMDB link"
+                                        width={25}
+                                        height={50}
+                                    />
+                                </a>
+                            </div>
+                        )}
 
-                    {item.imdbLink !== "" && (
-                        <div>
-                            <a href={item.imdbLink} target='_blank'>
-                                <Image src={"/imdb-svgrepo-com.svg"} alt="IMDB link" width={25} height={50}/>
-                            </a>
-                        </div>
-                    )}
+                        {!item.year &&
+                            !item.year &&
+                            item.description === '' &&
+                            item.imdbLink === '' &&
+                            (!item.tags || item.tags.length === 0) &&
+                            (!item.genres || item.genres.length === 0) && <>No details added yet!</>}
 
-                    { (!item.year && !item.year && item.description === "" && item.imdbLink === "") &&
-                        <>
-                            No details added yet!                    
-                        </>
-                    }
-
-                    <button onClick={handleDelete}>Delete</button>
-                    <button onClick={() => alert("i havent implemented this lol")}>Edit</button>
-
-
-
-                </div>
-            )}
+                        <button onClick={handleDelete}>Delete</button>
+                        <button
+                            onClick={() =>
+                                alert('i havent implemented this lol')
+                            }
+                        >
+                            Edit
+                        </button>
+                    </div>
+                ))}
         </div>
     );
 }

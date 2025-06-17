@@ -1,6 +1,7 @@
 import {notFound} from 'next/navigation'
 import { getWatchlistDoc } from '@/app/lib/firebase/firestore';
-import Watchlist from '../../components/Watchlist'
+import WatchlistComponent from '../../components/WatchlistPage'
+import { Watchlist } from '@/app/hooks/useUserWatchlist';
 
 export default async function WatchlistPage({ params }: {params: Promise<{watchlistId: string}>}) {
     const {watchlistId} = await params;
@@ -15,10 +16,10 @@ export default async function WatchlistPage({ params }: {params: Promise<{watchl
         ...watchlistDoc.data()
     };
     data["createdAt"] = data.createdAt?.toDate().toISOString()
-    const watchlist = data
+    const watchlist: Watchlist = data
 
     return (
-        <Watchlist watchlist={watchlist}/>
+        <WatchlistComponent watchlist={watchlist}/>
     )
 }
 

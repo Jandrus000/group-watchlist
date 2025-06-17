@@ -10,7 +10,6 @@ import {
     getDocs,
     query,
     where,
-    Timestamp,
     updateDoc,
     increment,
     onSnapshot,
@@ -18,6 +17,7 @@ import {
     DocumentData,
     runTransaction,
     deleteDoc,
+    deleteField,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Items } from '@/app/hooks/useWatchlistItems';
@@ -61,6 +61,7 @@ export async function addWatchlist(
             name: _name,
             userId: _userId,
             description: _description,
+            tags: {},
             createdAt: serverTimestamp(),
         });
     } catch (e) {
@@ -75,7 +76,9 @@ export async function addWatchlistItem(
     _year: number | null = null,
     _length: number | null = null,
     _description: string | null = null,
-    _imdbLink: string | null = null
+    _imdbLink: string | null = null,
+    _genre: string[] | null = null,
+    _tags: string[] | null
 ) {
     try {
         const itemsCollectionRef = collection(
@@ -90,6 +93,8 @@ export async function addWatchlistItem(
             imdbLink: _imdbLink,
             createdBy: _createdBy,
             watchListId: _watchListId,
+            genres: _genre,
+            tags: _tags,
             upVotes: 0,
             watched: false,
             createdAt: serverTimestamp(),
@@ -143,17 +148,21 @@ export async function getWatchlistItems(watchListId: string) {
     }));
 }
 
-export async function getVote(itemId: string, userId: string, watchlistId: string){
+export async function getVote(
+    itemId: string,
+    userId: string,
+    watchlistId: string
+) {
     const itemRef = doc(db, 'watchlists', watchlistId, 'items', itemId);
     const voteRef = doc(itemRef, 'votes', userId);
     const voteDocSnap = await getDoc(voteRef);
 
-    if (voteDocSnap.exists()){
-        return voteDocSnap.data().vote
-    } else{
-        return null
+    if (voteDocSnap.exists()) {
+        return voteDocSnap.data().vote;
+    } else {
+        return null;
     }
-}   
+}
 
 // ============== listeners ==============
 export function subscribeToWatchlistItems(
@@ -161,7 +170,6 @@ export function subscribeToWatchlistItems(
     onUpdate: (items: any[]) => void
 ): () => void {
     const q = query(collection(db, 'watchlists', watchListId, 'items'));
-
     const unsubscribe = onSnapshot(
         q,
         (querySnapShot: QuerySnapshot<DocumentData>) => {
@@ -173,6 +181,19 @@ export function subscribeToWatchlistItems(
         }
     );
 
+    return unsubscribe;
+}
+
+export function subscribeToWatchlist(
+    watchlistId: string,
+    onUpdate: (watchlistData: any) => void
+): () => void {
+    const docRef = doc(db, 'watchlists', watchlistId);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            onUpdate({ id: docSnap.id, ...docSnap.data() });
+        }
+    });
     return unsubscribe;
 }
 
@@ -198,7 +219,11 @@ export async function handleVote(
 
         if (!voteDoc.exists()) {
             // No existing vote; add new vote
-            transaction.set(voteRef, { userId, vote: voteValue, itemId: itemId });
+            transaction.set(voteRef, {
+                userId,
+                vote: voteValue,
+                itemId: itemId,
+            });
             voteChange = voteValue;
         } else {
             const existingVote = voteDoc.data().vote;
@@ -215,54 +240,131 @@ export async function handleVote(
 
         transaction.update(itemRef, {
             upVotes: increment(voteChange),
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
         });
     });
 }
 
-export async function updateWatchState(watchListId: string, itemId:string, watchedState: boolean){
-    const itemRef = doc(db, "watchlists", watchListId, "items", itemId);
-    const snapShot = await getDoc(itemRef)
-    console.dir(snapShot.data())
-    try{
+export async function updateWatchState(
+    watchListId: string,
+    itemId: string,
+    watchedState: boolean
+) {
+    const itemRef = doc(db, 'watchlists', watchListId, 'items', itemId);
+    const snapShot = await getDoc(itemRef);
+    console.dir(snapShot.data());
+    try {
         await updateDoc(itemRef, {
             watched: watchedState,
             updatedAt: serverTimestamp(),
-
-        })
-    } catch(error){
-        console.error(error)
+        });
+    } catch (error) {
+        console.error(error);
     }
-    
+}
+
+export async function incrementTag(watchListId: string, tag: string) {
+    const key = tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_');
+    const tagKey = `tags.${key}`;
+    const docRef = doc(db, 'watchlists', watchListId);
+
+    await updateDoc(docRef, {
+        [`${tagKey}.count`]: increment(1),
+    });
+
+    const snap = await getDoc(docRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+    const currentCount = data.tags[key].count ?? 0;
+    if (currentCount === 1) {
+        await updateDoc(docRef, {
+            [`${tagKey}.name`]: tag,
+        });
+    }
+}
+
+export async function decrementTag(watchListId: string, tag: string) {
+    const tagKey = `tags.${tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_')}`;
+
+    const docRef = doc(db, 'watchlists', watchListId);
+    const snap = await getDoc(docRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+    const currentCount =
+        data.tags?.[tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_')].count ?? 0;
+
+    if (currentCount <= 1) {
+        await updateDoc(docRef, {
+            [tagKey]: deleteField(),
+        });
+    } else {
+        await updateDoc(docRef, {
+            [tagKey]: increment(-1),
+        });
+    }
 }
 
 // ============== delete ==============
 
-export async function deleteItem(item: Items){
-    const docRef = doc(db, 'watchlists', item.watchListId, 'items', item.id)
-    try{
-        await deleteDoc(docRef);
-    }catch(e){
-        console.error(e)
+export async function deleteItem(item: Items) {
+    const voteRef = collection(
+        db,
+        'watchlists',
+        item.watchListId,
+        'items',
+        item.id,
+        'votes'
+    );
+    const voteSnapshot = await getDocs(voteRef);
+    try {
+        const voteDeletes = voteSnapshot.docs.map((voteDoc) =>
+            deleteDoc(voteDoc.ref)
+        );
+        await Promise.all(voteDeletes);
+
+        // if (item.tags){
+        //     for(const tag of item.tags) {
+        //         await decrementTag(item.watchListId, tag)
+        //     }
+        // }
+
+        await deleteDoc(
+            doc(db, 'watchlists', item.watchListId, 'items', item.id)
+        );
+    } catch (e) {
+        console.error(e);
     }
 }
 
-export async function deleteWatchlist(watchlist: Watchlist){
-    const itemsDocRef = collection(db, 'watchlists', watchlist.id, 'items')
-    const itemsSnapshot = await getDocs(itemsDocRef)
-    try{
+export async function deleteWatchlist(watchlist: Watchlist) {
+    const itemsDocRef = collection(db, 'watchlists', watchlist.id, 'items');
+    const itemsSnapshot = await getDocs(itemsDocRef);
+    try {
         for (const itemDoc of itemsSnapshot.docs) {
             const itemId = itemDoc.id;
-            const votesCollectionRef = collection(db, 'watchlists', watchlist.id, 'items', itemId, 'votes')
+            const votesCollectionRef = collection(
+                db,
+                'watchlists',
+                watchlist.id,
+                'items',
+                itemId,
+                'votes'
+            );
             const votesSnapshot = await getDocs(votesCollectionRef);
 
-            const voteDeletes = votesSnapshot.docs.map((voteDoc) => deleteDoc(voteDoc.ref));
+            const voteDeletes = votesSnapshot.docs.map((voteDoc) =>
+                deleteDoc(voteDoc.ref)
+            );
             await Promise.all(voteDeletes);
 
-            await deleteDoc(itemDoc.ref)
+            await deleteDoc(itemDoc.ref);
         }
-        await deleteDoc(doc(db,'watchlists', watchlist.id));
-    }catch(e){
-        console.error(e)
+        await deleteDoc(doc(db, 'watchlists', watchlist.id));
+    } catch (e) {
+        console.error(e);
     }
 }

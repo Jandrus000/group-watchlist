@@ -1,3 +1,5 @@
+"use client"
+
 import { Watchlist } from '../hooks/useUserWatchlist';
 import Image from 'next/image';
 import Modal from './Modal';

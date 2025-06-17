@@ -2,6 +2,7 @@ import { query, Timestamp } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { addWatchlistItem, getWatchlistItems, subscribeToWatchlistItems, handleVote} from '../lib/firebase/firestore';
 import { subscribe } from 'diagnostics_channel';
+import { incrementTag } from '../lib/firebase/firestore';
 
 export type Items = {
     id: string;
@@ -14,6 +15,8 @@ export type Items = {
     watchListId: string;
     upVotes: number;
     watched: boolean;
+    genres: string[] | null;
+    tags: string[] | null
     createdAt: Timestamp;
     updatedAt: Timestamp;
 };
@@ -39,7 +42,9 @@ export function useWatchlistItems(watchListId: string) {
         year: number | null,
         length: number | null,
         description: string | null,
-        imdbLink: string | null
+        imdbLink: string | null,
+        genre: string[] | null,
+        tags: string[] | null
     ) => {
         await addWatchlistItem(
             title,
@@ -48,7 +53,9 @@ export function useWatchlistItems(watchListId: string) {
             year,
             length,
             description,
-            imdbLink
+            imdbLink,
+            genre,
+            tags
         );
 
         const data = await getWatchlistItems(watchListId);

@@ -72,14 +72,31 @@ watchlistMovies/{entryId}
 
 movies/{movieId}
 {
-  title: "Inception",
-  genres: ["Sci-Fi", "Thriller"],
-  imdbLink: "https://imdb.com/title/tt1375666/",
-  director: "Christopher Nolan",
-  releaseYear: 2010,
-  lengthMinutes: 148,
-  upvoteCount: 4523
-  watched: boolean
+  votes: SubCollection
+  id: string; ✅
+  title: string;  ✅
+  year: number | null; ✅
+  length: number | null; ✅
+  description: string | null; ✅
+  imdbLink: string; ✅
+  createdBy: string; ✅
+  watchListId: string; ✅
+  upVotes: number; ✅
+  watched: boolean; ✅
+  createdAt: Timestamp; ✅
+  updatedAt: Timestamp; ✅
+  genre ✅
+  tags ✅
+  director: string
+  imdbRating: number
+  mpaRating: string
+  trailerurl: string
+  show: boolean ✅
+  season: number
+  end-year: number
+  Avgepisodes: number per season 
 }
 ```
+
+
 

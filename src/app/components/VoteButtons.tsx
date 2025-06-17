@@ -1,3 +1,5 @@
+"use client"
+
 import { useAuthContext } from '../context/AuthContext';
 import { use, useEffect, useState } from 'react';
 import { getVote } from '../lib/firebase/firestore';
