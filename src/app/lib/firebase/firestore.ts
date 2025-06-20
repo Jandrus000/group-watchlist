@@ -71,14 +71,34 @@ export async function addWatchlist(
 
 export async function addWatchlistItem(
     _title: string,
+    _type: 'movie' | 'tv' | 'other',
     _watchListId: string,
     _createdBy: string,
+    _createdByUsername: string | null,
+    _rating: | ''
+            | 'g'
+            | 'pg'
+            | 'pg-13'
+            | 'r'
+            | 'tv-y'
+            | 'tv-y7'
+            | 'tv-g'
+            | 'tv-pg'
+            | 'tv-14'
+            | 'tv-ma',
     _year: number | null = null,
+    _endYear : number | null = null,
     _length: number | null = null,
     _description: string | null = null,
     _imdbLink: string | null = null,
     _genre: string[] | null = null,
-    _tags: string[] | null
+    _tags: string[] | null = null,
+    _director: string | null = null,
+    _imdbRating: number | null = null,
+    _trailerLink: string | null = null,
+    _seasons: number | null = null,
+    _episodes: number | null = null
+
 ) {
     try {
         const itemsCollectionRef = collection(
@@ -87,14 +107,23 @@ export async function addWatchlistItem(
         );
         await addDoc(itemsCollectionRef, {
             title: _title,
+            type: _type,
             year: _year,
+            endYear: _endYear,
             length: _length,
             description: _description,
             imdbLink: _imdbLink,
             createdBy: _createdBy,
+            createdByUsername: _createdByUsername,
             watchListId: _watchListId,
             genres: _genre,
             tags: _tags,
+            director: _director,
+            rating: _rating,
+            imdbRating: _imdbRating,
+            trailerLink: _trailerLink,
+            seasons: _seasons,
+            episodes: _episodes,
             upVotes: 0,
             watched: false,
             createdAt: serverTimestamp(),
@@ -161,6 +190,17 @@ export async function getVote(
         return voteDocSnap.data().vote;
     } else {
         return null;
+    }
+}
+
+export async function getUserName(userId: string) {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef)
+
+    if(userSnap.exists()){
+        return userSnap.data().username;
+    } else {
+        return null
     }
 }
 
@@ -252,7 +292,6 @@ export async function updateWatchState(
 ) {
     const itemRef = doc(db, 'watchlists', watchListId, 'items', itemId);
     const snapShot = await getDoc(itemRef);
-    console.dir(snapShot.data());
     try {
         await updateDoc(itemRef, {
             watched: watchedState,

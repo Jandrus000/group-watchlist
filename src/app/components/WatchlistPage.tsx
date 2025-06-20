@@ -11,16 +11,6 @@ import AddWatchlistModal from './AddWatchlistModal';
 
 export default function WatchlistPage({ watchlist }: { watchlist: Watchlist }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [itemTitle, setItemTitle] = useState('');
-    // const [itemYear, setItemYear] = useState('');
-    // const [itemDescription, setItemDescription] = useState('');
-    // const [imdbLink, setImdbLink] = useState('');
-    // const [itemLength, setitemLength] = useState('');
-    // const [errors, setErrors] = useState<string[]>([]);
-    // const [itemType, setItemType] = useState<'movie' | 'tv' | 'other'>('movie');
-    // const [pickedGenres, setPickedgenres] = useState<string[]>([]);
-    // const [pickedTags, setPickedtags] = useState<string[]>([]);
-    // const [itemDirector, setItemDirector] = useState('');
 
     const { user, loading } = useAuthContext();
 

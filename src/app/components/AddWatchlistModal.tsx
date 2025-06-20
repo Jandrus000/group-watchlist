@@ -7,8 +7,17 @@ import { User } from 'firebase/auth';
 import { Watchlist } from '../hooks/useUserWatchlist';
 import { incrementTag } from '../lib/firebase/firestore';
 
-
-export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsModalOpen }: { watchlist: Watchlist, user:User| null, isModalOpen: boolean, setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+export default function AddWatchlistModal({
+    watchlist,
+    user,
+    isModalOpen,
+    setIsModalOpen,
+}: {
+    watchlist: Watchlist;
+    user: User | null;
+    isModalOpen: boolean;
+    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
     const { addItem } = useWatchlistItems(watchlist.id);
 
     const [itemTitle, setItemTitle] = useState('');
@@ -20,7 +29,26 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
     const [itemType, setItemType] = useState<'movie' | 'tv' | 'other'>('movie');
     const [pickedGenres, setPickedgenres] = useState<string[]>([]);
     const [pickedTags, setPickedtags] = useState<string[]>([]);
+
     const [itemDirector, setItemDirector] = useState('');
+    const [itemSeasons, setItemSeasons] = useState('');
+    const [itemEpisodes, setItemEpisodes] = useState('');
+    const [itemRating, setItemRating] = useState<
+        | ''
+        | 'g'
+        | 'pg'
+        | 'pg-13'
+        | 'r'
+        | 'tv-y'
+        | 'tv-y7'
+        | 'tv-g'
+        | 'tv-pg'
+        | 'tv-14'
+        | 'tv-ma'
+    >('');
+    const [itemEndYear, setItemEndYear] = useState('')
+    const [imdbItemRating, setImdbRating] = useState('')
+    const [trailerLink, setTrailerLink] = useState('')
 
     function handleModalClose() {
         setIsModalOpen(false);
@@ -33,43 +61,92 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
         setPickedgenres([]);
         setPickedtags([]);
         setItemDirector('');
+        setItemDirector('')
+        setItemSeasons('');
+        setItemEpisodes('')
+        setItemRating('')
+        setItemEndYear('')
+        setImdbRating('')
+        setTrailerLink('')
     }
 
     async function handleCreateItem() {
         setErrors([]);
         let year = null;
         let length = null;
+        let endYear = null
+        let seasons = null
+        let episodes = null
+        let imdbRating = null
+        
+
         if (itemTitle.trim() === '') {
             setErrors([...errors, 'You have to include a title']);
             return;
         }
 
         if (
-            itemYear.trim() !== '' &&
-            (isNaN(Number(itemYear.trim())) || itemYear.trim().length !== 4)
+            (itemYear.trim() !== '' &&
+            (isNaN(Number(itemYear.trim())) || itemYear.trim().length !== 4)) ||
+            (itemEndYear.trim() !== '' &&
+            (isNaN(Number(itemEndYear.trim())) || itemEndYear.trim().length !== 4))
         ) {
             setErrors([...errors, 'Not a valid year']);
             return;
         }
         if (itemYear.trim() !== '') {
-            year = Number(itemYear);
+            year = Number(itemYear.trim());
+        }
+
+        if (itemEndYear.trim() !== '') {
+            endYear = Number(itemEndYear.trim());
         }
 
         if (itemLength.trim() !== '') {
-            length = Number(itemLength);
+            length = Number(itemLength.trim());
+        }
+
+        if(itemSeasons.trim() !== '') {
+            seasons = Number(itemSeasons.trim())
+        }
+
+        if(itemEpisodes.trim() !== '') {
+            episodes = Number(itemEpisodes.trim())
+        }
+
+        if (imdbItemRating.trim() !== '' && isNaN(Number(imdbItemRating.trim()))) {
+            setErrors([...errors, 'not a valid imdb rating'])
+            return
+        } else if(imdbItemRating.trim() !== ''){
+            imdbRating = Math.round(Number(imdbItemRating.trim())*10)/10
+        }
+
+        if(itemType === 'movie'){
+            endYear = null
+            seasons = null
+            episodes = null
         }
 
         if (user?.uid) {
             addItem(
                 itemTitle,
+                itemType,
                 watchlist.id,
                 user?.uid,
+                user?.displayName,
                 year,
+                endYear,
                 length,
                 itemDescription,
                 imdbLink,
                 pickedGenres,
-                pickedTags
+                pickedTags,
+                itemDirector,
+                itemRating,
+                imdbRating,
+                trailerLink,
+                seasons,
+                episodes
             );
             const tags = pickedTags;
             handleModalClose();
@@ -121,7 +198,7 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                     onChange={(e) => setItemDirector(e.target.value)}
                 />
 
-                {/* {itemType === 'tv' && (
+                {itemType === 'tv' && (
                     <>
                         <label htmlFor="item-seasons">Seasons</label>
                         <input
@@ -131,9 +208,9 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                             onChange={(e) => setItemSeasons(e.target.value)}
                         />
                     </>
-                )} */}
+                )}
 
-                {/* {itemType === 'tv' && (
+                {itemType === 'tv' && (
                     <>
                         <label htmlFor="item-episodes">
                             Episodes per season
@@ -145,9 +222,9 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                             onChange={(e) => setItemEpisodes(e.target.value)}
                         />
                     </>
-                )} */}
+                )}
 
-                {/* <label htmlFor="item-rating">MPA Rating</label>
+                <label htmlFor="item-rating">MPA Rating</label>
                 <select
                     id="item-rating"
                     value={itemRating}
@@ -189,7 +266,7 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                     )}
                     <option value={'urated'}>unrated</option>
                     <option value={'other'}>other</option>
-                </select> */}
+                </select>
 
                 <GenrePicker
                     pickedGenres={pickedGenres}
@@ -210,7 +287,7 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                     onChange={(e) => setItemYear(e.target.value)}
                 />
 
-                {/* {itemType === 'tv' && (
+                {itemType === 'tv' && (
                     // how do i indicate show is on going?
                     <>
                         <label htmlFor="item-end-year">End year</label>
@@ -221,7 +298,7 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                             onChange={(e) => setItemEndYear(e.target.value)}
                         />
                     </>
-                )} */}
+                )}
 
                 <label htmlFor="item-length">
                     {itemType === 'tv' && 'Avg Episode '}Length (in minutes)
@@ -233,16 +310,16 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                     onChange={(e) => setitemLength(e.target.value)}
                 />
 
-                {/* <label htmlFor="item-imdb-rating">IMDB rating</label>
+                <label htmlFor="item-imdb-rating">IMDB rating</label>
                 <input
                     id="item-imdb-rating"
                     type="number"
-                    value={imdbRating}
+                    value={imdbItemRating}
                     onChange={(e) => setImdbRating(e.target.value)}
                     min={0}
                     max={10}
                     step={0.1}
-                /> */}
+                />
 
                 <label htmlFor="item-imdb-link">IMDB link</label>
                 <input
@@ -252,13 +329,13 @@ export default function AddWatchlistModal({ watchlist, user, isModalOpen, setIsM
                     onChange={(e) => setImdbLink(e.target.value)}
                 />
 
-                {/* <label htmlFor="trailer-link">Trailer link</label>
+                <label htmlFor="trailer-link">Trailer link</label>
                 <input
                     id="trailer-link"
                     type="text"
                     value={trailerLink}
                     onChange={(e) => setTrailerLink(e.target.value)}
-                /> */}
+                />
 
                 <div id="errors">
                     {errors.map((error, i) => {

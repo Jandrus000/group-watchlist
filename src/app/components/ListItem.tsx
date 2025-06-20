@@ -1,12 +1,14 @@
-"use client"
+'use client';
 
 import { Items } from '../hooks/useWatchlistItems';
 import styles from '../page.module.css';
 import VoteButtons from './VoteButtons';
 import CheckBox from './CheckBox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { decrementTag, deleteItem } from '../lib/firebase/firestore';
+import { decrementTag, deleteItem, getUserName } from '../lib/firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
+import { time } from 'console';
 
 export default function ListItem({
     item,
@@ -20,16 +22,33 @@ export default function ListItem({
     watched: boolean;
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [username, setUsername] = useState(item.createdByUsername || '')
     const [editMode, setIsEditMode] = useState(false);
 
+    useEffect(() => {
+        if (username === '') {
+            getUserName(item.createdBy).then(setUsername)
+        }
+    }, [item.createdByUsername, item.createdBy, username])
+
     async function handleDelete() {
-        const tags = item.tags
+        const tags = item.tags;
         deleteItem(item);
-        if(tags){
-            for (const tag of tags){
-                await decrementTag(item.watchListId, tag)
+        if (tags) {
+            for (const tag of tags) {
+                await decrementTag(item.watchListId, tag);
             }
         }
+    }
+
+    function formatDate(timestamp: Timestamp){
+        const dateObj = timestamp.toDate()
+        const formattedDate = dateObj.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        })
+        return formattedDate
     }
 
     return (
@@ -60,9 +79,7 @@ export default function ListItem({
 
             {isOpen &&
                 (editMode ? (
-                    <form>
-                        
-                    </form>
+                    <form></form>
                 ) : (
                     <div
                         className={`${styles.accordianDropdown} ${
@@ -73,6 +90,20 @@ export default function ListItem({
                             <>
                                 <span className="bold">Description</span>
                                 <p>{item.description}</p>
+                            </>
+                        )}
+
+                        {item.rating !== '' && (
+                            <>
+                                <span className="bold">MPA Rating</span>
+                                <p>{item.rating}</p>
+                            </>
+                        )}
+
+                        {item.director !== '' && (
+                            <>
+                                <span className="bold">Director</span>
+                                <p>{item.director}</p>
                             </>
                         )}
 
@@ -88,31 +119,62 @@ export default function ListItem({
                         {item.year && (
                             <div>
                                 <span className="bold">Release Year</span>
-                                <span>{item.year}</span>
+                                <span>
+                                    {item.year}
+                                    {item.endYear && `-${item.endYear}`}
+                                </span>
                             </div>
                         )}
 
-                        
-                        { item.genres && item.genres.length > 0 &&
-                        <>
-                            <span className="bold">Genre</span>
-                            {item.genres?.map((genre: string, i:number) => 
-                                <span key={i}>{genre}</span>
-                            )}
-                        </>
-                        }
+                        {item.seasons && (
+                            <div>
+                                <span className="bold">Seasons</span>
+                                <span>{item.seasons}</span>
+                            </div>
+                        )}
 
-                        
-                        {
-                            item.tags && item.tags.length > 0 &&
-                            (
-                                <>
-                                    <span className="bold">Tags</span>
-                                    {item.tags?.map((tag: string, i:number) => 
-                                        <span key={i}>{tag}</span>
-                                    )}
-                                </>
-                            )
+                        {item.episodes && (
+                            <div>
+                                <span className="bold">
+                                    Episodes per season
+                                </span>
+                                <span>{item.episodes}</span>
+                            </div>
+                        )}
+
+                        {item.genres && item.genres.length > 0 && (
+                            <>
+                                <span className="bold">Genre</span>
+                                {item.genres?.map(
+                                    (genre: string, i: number) => (
+                                        <span key={i}>
+                                            <br />
+                                            {genre}
+                                        </span>
+                                    )
+                                )}
+                            </>
+                        )}
+
+                        {item.tags && item.tags.length > 0 && (
+                            <>
+                                <span className="bold">Tags</span>
+                                {item.tags?.map((tag: string, i: number) => (
+                                    <span key={i}>
+                                        <br />
+                                        {tag}
+                                    </span>
+                                ))}
+                            </>
+                        )}
+
+                        {item.imdbRating && 
+                            <div>
+                                <span className="bold">
+                                    Imdb Rating
+                                </span>
+                                <span>{item.imdbRating}/10</span>
+                            </div>
                         }
 
                         {item.imdbLink !== '' && (
@@ -128,12 +190,33 @@ export default function ListItem({
                             </div>
                         )}
 
-                        {!item.year &&
-                            !item.year &&
-                            item.description === '' &&
-                            item.imdbLink === '' &&
-                            (!item.tags || item.tags.length === 0) &&
-                            (!item.genres || item.genres.length === 0) && <>No details added yet!</>}
+                        {item.trailerLink !== '' &&
+                            item.trailerLink !== null && (
+                                <div>
+                                    <a href={item.trailerLink} target="_blank">
+                                        <Image
+                                            src={'/video-file.svg'}
+                                            alt="Trailer link"
+                                            width={25}
+                                            height={50}
+                                        />
+                                    </a>
+                                </div>
+                            )}
+
+                        <div>
+                            <span className="bold">
+                                Added
+                            </span>
+                            <span>{formatDate(item.createdAt)}</span>
+                        </div>
+                        
+                        <div>
+                            <span className="bold">
+                                Added by
+                            </span>
+                            <span>{ username || `User ${item.createdBy}`}</span>
+                        </div>
 
                         <button onClick={handleDelete}>Delete</button>
                         <button

@@ -49,8 +49,8 @@ service cloud.firestore {
       match /items/{itemId} {
         allow create: if request.auth != null && 
         request.resource.data.keys().hasOnly([
-        'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
-        'createdBy', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags'
+        'title', 'type', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
+        'createdBy', 'createdByUsername', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags', 'director', 'seasons', 'episodes', 'rating', 'endYear', 'imdbRating', 'trailerLink'
         ]) &&
         request.resource.data.watchListId == watchlistId &&
         request.resource.data.title is string &&
@@ -58,24 +58,62 @@ service cloud.firestore {
         (request.resource.data.length == null || request.resource.data.length <= 99999) &&
         request.resource.data.description.size() <= 500 &&
         request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.createdByUsername == request.auth.token.name &&
         request.resource.data.createdAt == request.time &&
-        (request.resource.data.genres is list || request.resource.data.genres == null) &&
-        (request.resource.data.genres.hasOnly([
-        'Action', 'Adventure', 'Anthology', 'Animation', 'Anime', 'Biographical', 'Children', 'Comedy', 'Coming of Age', 'Computer Animation', 'Crime', 'Cyberpunk', 'Dance', 'Dark Comedy', 'Disaster', 'Documentary', 'Drama', 'Dystopian', 'Educational', 'Esports', 'Experimental', 'Family', 'Fantasy', 'Food', 'Game Show', 'Harem', 'Heist', 'Historical', 'Horror', 'Isekai', 'Legal', 'Live Action', 'Martial Arts', 'Mecha', 'Medical', 'Mockumentary', 'Music', 'Musical', 'Mystery', 'Mythology', 'Nature', 'Noir', 'Parody', 'Period Drama', 'Political', 'Post-Apocalyptic', 'Psychological', 'Reality TV', 'Road Movie', 'Romance', 'Romantic Comedy', 'Samurai', 'Satire', 'School', 'Science Fiction', 'Short', 'Slice of Life', 'Soap', 'Space Opera', 'Sports', 'Spy', 'Stand-Up', 'Steampunk', 'Superhero', 'Supernatural', 'Suspense', 'Talk Show', 'Thriller', 'Time Travel', 'TV Movie', 'Urban', 'Variety Show', 'Vampire', 'War', 'Western', 'Whodunit', 'Zombie'
-        ]) || request.resource.data.genres == null) &&
+        (
+          (
+            request.resource.data.genres is list) &&
+            request.resource.data.genres.hasOnly([
+              'Action', 'Adventure', 'Anthology', 'Animation', 'Anime', 'Biographical', 'Children', 'Comedy', 'Coming of Age', 'Computer Animation', 'Crime', 'Cyberpunk', 'Dance', 'Dark Comedy', 'Disaster', 'Documentary', 'Drama', 'Dystopian', 'Educational', 'Esports', 'Experimental', 'Family', 'Fantasy', 'Food', 'Game Show', 'Harem', 'Heist', 'Historical', 'Horror', 'Isekai', 'Legal', 'Live Action', 'Martial Arts', 'Mecha', 'Medical', 'Mockumentary', 'Music', 'Musical', 'Mystery', 'Mythology', 'Nature', 'Noir', 'Parody', 'Period Drama', 'Political', 'Post-Apocalyptic', 'Psychological', 'Reality TV', 'Road Movie', 'Romance', 'Romantic Comedy', 'Samurai', 'Satire', 'School', 'Science Fiction', 'Short', 'Slice of Life', 'Soap', 'Space Opera', 'Sports', 'Spy', 'Stand-Up', 'Steampunk', 'Superhero', 'Supernatural', 'Suspense', 'Talk Show', 'Thriller', 'Time Travel', 'TV Movie', 'Urban', 'Variety Show', 'Vampire', 'War', 'Western', 'Whodunit', 'Zombie'
+            ]
+          ) 
+          || request.resource.data.genres == null
+        ) &&
         request.resource.data.updatedAt == request.time &&
         (request.resource.data.upVotes == 0 || request.resource.data.upVotes == null) &&
         (
-        !('year' in request.resource.data) || 
-        (request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100))
-        );
+          request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)
+        ) &&
+        (
+          request.resource.data.type == 'movie' ||
+          request.resource.data.type == 'tv' ||
+          request.resource.data.type == 'other'
+        ) &&
+        (
+          request.resource.data.endYear == null || (request.resource.data.endYear >= 1800 && request.resource.data.endYear <= 2100)
+        ) &&
+        request.resource.data.director is string &&
+        (request.resource.data.seasons is number || request.resource.data.seasons == null) &&
+        (request.resource.data.episodes is number || request.resource.data.episodes == null) &&
+        (
+          request.resource.data.rating == '' ||
+          request.resource.data.rating == 'g' ||
+          request.resource.data.rating == 'pg' ||
+          request.resource.data.rating == 'pg-13' ||
+          request.resource.data.rating == 'r' ||
+          request.resource.data.rating == 'tv-y' ||
+          request.resource.data.rating == 'tv-y7' ||
+          request.resource.data.rating == 'tv-g' ||
+          request.resource.data.rating == 'tv-pg' ||
+          request.resource.data.rating == 'tv-14' ||
+          request.resource.data.rating == 'tv-ma'
+        ) &&
+        (
+          (
+            request.resource.data.imdbRating is number && 
+            request.resource.data.imdbRating > 0 &&
+            request.resource.data.imdbRating <= 10
+          ) ||
+          request.resource.data.episodes == null
+        ) &&
+        (request.resource.data.trailerLink is string || request.resource.data.trailerLink == null);
 
         allow read: if true; // Anyone can read items
 
         allow update: if request.auth != null && 
         request.resource.data.keys().hasOnly([
-        'title', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
-        'createdBy', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags'
+        'title', 'type', 'description', 'length', 'year', 'updatedAt', 'watched', 'imdbLink',
+        'createdBy', 'watchListId', 'createdAt', 'upVotes', 'genres', 'tags', 'director', 'seasons', 'episodes', 'rating', 'endYear', 'imdbRating', 'trailerLink'
         ]) &&
         request.resource.data.createdAt == resource.data.createdAt &&
         request.resource.data.createdBy == resource.data.createdBy &&
@@ -91,9 +129,41 @@ service cloud.firestore {
         request.resource.data.description.size() <= 500 &&
         request.resource.data.updatedAt == request.time &&
         (
-        !('year' in request.resource.data) || 
-        (request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100))
-        );
+          request.resource.data.year == null || (request.resource.data.year >= 1800 && request.resource.data.year <= 2100)
+        ) &&
+        (
+          request.resource.data.type == 'movie' ||
+          request.resource.data.type == 'tv' ||
+          request.resource.data.type == 'other'
+        ) &&
+        (
+          request.resource.data.endYear == null || (request.resource.data.endYear >= 1800 && request.resource.data.endYear <= 2100)
+        ) &&
+        request.resource.data.director is string &&
+        (request.resource.data.seasons is number || request.resource.data.seasons == null) &&
+        (request.resource.data.episodes is number || request.resource.data.episodes == null) &&
+        (
+          request.resource.data.rating == '' ||
+          request.resource.data.rating == 'g' ||
+          request.resource.data.rating == 'pg' ||
+          request.resource.data.rating == 'pg-13' ||
+          request.resource.data.rating == 'r' ||
+          request.resource.data.rating == 'tv-y' ||
+          request.resource.data.rating == 'tv-y7' ||
+          request.resource.data.rating == 'tv-g' ||
+          request.resource.data.rating == 'tv-pg' ||
+          request.resource.data.rating == 'tv-14' ||
+          request.resource.data.rating == 'tv-ma'
+        ) &&
+        (
+          (
+            request.resource.data.imdbRating is number && 
+            request.resource.data.imdbRating > 0 &&
+            request.resource.data.imdbRating <= 10
+          ) ||
+          request.resource.data.episodes == null
+        ) &&
+        (request.resource.data.trailerLink is string || request.resource.data.trailerLink == null);
 
         allow delete: if request.auth != null; // Anyone signed-in can delete items
         // ----- VOTES SUBCOLLECTION -----

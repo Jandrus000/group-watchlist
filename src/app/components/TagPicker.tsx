@@ -33,11 +33,9 @@ export default function TagPicker({
     const tagTrie = new Trie();
     
     if(!loading){
-        console.log(watchlist)
 
         if (watchlist.tags) {
             for (const tag of Object.keys(watchlist.tags)) {
-                console.log((watchlist.tags as any)[tag].name)
                 if((watchlist.tags as any)[tag].name){
                     tagTrie.insert((watchlist.tags as any)[tag].name);
                 }
@@ -79,7 +77,10 @@ export default function TagPicker({
                               </li>
                           ))
                     : null}
-                <li onClick={async () => await addTag(searchItem)}>+ Add as new Tag</li>
+                {
+                    searchItem !== '' &&
+                    <li onClick={async () => await addTag(searchItem)}>+ Add as new Tag</li>
+                }
             </ul>
         </>
     );
