@@ -45,9 +45,9 @@ export default function TagPicker({
 
     return (
         <>
-            <label htmlFor="item-genre">Tags</label>
+            <label htmlFor="item-tags">Tags</label>
             <input
-                id={'item-genre'}
+                id={'item-tags'}
                 value={searchItem}
                 onChange={(e) => setSearchItem(e.target.value)}
             />

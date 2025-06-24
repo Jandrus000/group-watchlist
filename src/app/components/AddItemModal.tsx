@@ -7,7 +7,7 @@ import { User } from 'firebase/auth';
 import { Watchlist } from '../hooks/useUserWatchlist';
 import { incrementTag } from '../lib/firebase/firestore';
 
-export default function AddWatchlistModal({
+export default function AddItemModal({
     watchlist,
     user,
     isModalOpen,
@@ -60,7 +60,6 @@ export default function AddWatchlistModal({
         setErrors([]);
         setPickedgenres([]);
         setPickedtags([]);
-        setItemDirector('');
         setItemDirector('')
         setItemSeasons('');
         setItemEpisodes('')
@@ -288,7 +287,7 @@ export default function AddWatchlistModal({
                 />
 
                 {itemType === 'tv' && (
-                    // how do i indicate show is on going?
+                    // todo how do i indicate show is on going?
                     <>
                         <label htmlFor="item-end-year">End year</label>
                         <input

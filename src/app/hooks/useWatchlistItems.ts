@@ -5,9 +5,8 @@ import {
     getWatchlistItems,
     subscribeToWatchlistItems,
     handleVote,
+    editItem,
 } from '../lib/firebase/firestore';
-import { subscribe } from 'diagnostics_channel';
-import { incrementTag } from '../lib/firebase/firestore';
 
 export type Items = {
     id: string;
@@ -119,6 +118,59 @@ export function useWatchlistItems(watchListId: string) {
         setItems(data as Items[]);
     };
 
+    const handleEditItem = async (
+        itemTitle: string,
+        itemType: 'movie' | 'tv' | 'other',
+        watchlistId: string,
+        itemId: string,
+        year: number | null | undefined,
+        endYear: number | null | undefined,
+        length: number | null | undefined,
+        itemDescription: string | null | undefined,
+        imdbLink: string | null | undefined,
+        pickedGenres: string[] | null | undefined,
+        pickedTags: string[] | null | undefined,
+        itemDirector: string | null | undefined,
+        itemRating:
+            | ''
+            | 'g'
+            | 'pg'
+            | 'pg-13'
+            | 'r'
+            | 'tv-y'
+            | 'tv-y7'
+            | 'tv-g'
+            | 'tv-pg'
+            | 'tv-14'
+            | 'tv-ma',
+        imdbRating: number | null | undefined,
+        trailerLink: string | null | undefined,
+        seasons: number | null | undefined,
+        episodes: number | null | undefined
+    ) => {
+        await editItem(
+            itemTitle,
+            itemType,
+            watchlistId,
+            itemId,
+            itemRating,
+            year,
+            endYear,
+            length,
+            itemDescription,
+            imdbLink,
+            pickedGenres,
+            pickedTags,
+            itemDirector,
+            imdbRating,
+            trailerLink,
+            seasons,
+            episodes
+        );
+        const data = await getWatchlistItems(watchListId);
+        setItems(data as Items[]);
+    };
+
     const upVote = async (itemId: string, userId: string) => {
         await handleVote(itemId, userId, 1, watchListId);
     };
@@ -131,6 +183,7 @@ export function useWatchlistItems(watchListId: string) {
         items,
         itemsLoading,
         addItem: handleAddItem,
+        editItem: handleEditItem,
         upVote,
         downVote,
     };

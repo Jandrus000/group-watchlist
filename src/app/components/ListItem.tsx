@@ -3,33 +3,40 @@
 import { Items } from '../hooks/useWatchlistItems';
 import styles from '../page.module.css';
 import VoteButtons from './VoteButtons';
+import ItemEdit from './ItemEdit';
 import CheckBox from './CheckBox';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { decrementTag, deleteItem, getUserName } from '../lib/firebase/firestore';
+import {
+    decrementTag,
+    deleteItem,
+    getUserName,
+} from '../lib/firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
-import { time } from 'console';
+import { User } from 'firebase/auth';
 
 export default function ListItem({
     item,
     upVote,
     downVote,
     watched,
+    user,
 }: {
     item: Items;
     upVote: any;
     downVote: any;
     watched: boolean;
+    user: User | null;
 }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [username, setUsername] = useState(item.createdByUsername || '')
+    const [username, setUsername] = useState(item.createdByUsername || '');
     const [editMode, setIsEditMode] = useState(false);
 
     useEffect(() => {
         if (username === '') {
-            getUserName(item.createdBy).then(setUsername)
+            getUserName(item.createdBy).then(setUsername);
         }
-    }, [item.createdByUsername, item.createdBy, username])
+    }, [item.createdByUsername, item.createdBy, username]);
 
     async function handleDelete() {
         const tags = item.tags;
@@ -41,14 +48,20 @@ export default function ListItem({
         }
     }
 
-    function formatDate(timestamp: Timestamp){
-        const dateObj = timestamp.toDate()
-        const formattedDate = dateObj.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        })
-        return formattedDate
+    function formatDate(
+        timestamp: Timestamp | Date | string | null | undefined
+    ) {
+        if (timestamp instanceof Timestamp) {
+            const dateObj = timestamp.toDate();
+            const formattedDate = dateObj.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+            });
+            return formattedDate;
+        } else {
+            return 'Issue with date';
+        }
     }
 
     return (
@@ -78,8 +91,13 @@ export default function ListItem({
             </div>
 
             {isOpen &&
-                (editMode ? (
-                    <form></form>
+                (editMode && !watched ? (
+                    <ItemEdit
+                        item={item}
+                        setIsEditMode={setIsEditMode}
+                        watched={watched}
+                        user={user}
+                    />
                 ) : (
                     <div
                         className={`${styles.accordianDropdown} ${
@@ -168,14 +186,12 @@ export default function ListItem({
                             </>
                         )}
 
-                        {item.imdbRating && 
+                        {item.imdbRating && (
                             <div>
-                                <span className="bold">
-                                    Imdb Rating
-                                </span>
+                                <span className="bold">Imdb Rating</span>
                                 <span>{item.imdbRating}/10</span>
                             </div>
-                        }
+                        )}
 
                         {item.imdbLink !== '' && (
                             <div>
@@ -205,27 +221,21 @@ export default function ListItem({
                             )}
 
                         <div>
-                            <span className="bold">
-                                Added
-                            </span>
+                            <span className="bold">Added</span>
                             <span>{formatDate(item.createdAt)}</span>
                         </div>
-                        
+
                         <div>
-                            <span className="bold">
-                                Added by
-                            </span>
-                            <span>{ username || `User ${item.createdBy}`}</span>
+                            <span className="bold">Added by</span>
+                            <span>{username || `User ${item.createdBy}`}</span>
                         </div>
 
                         <button onClick={handleDelete}>Delete</button>
-                        <button
-                            onClick={() =>
-                                alert('i havent implemented this lol')
-                            }
-                        >
-                            Edit
-                        </button>
+                        {!watched && (
+                            <button onClick={() => setIsEditMode(true)}>
+                                Edit
+                            </button>
+                        )}
                     </div>
                 ))}
         </div>

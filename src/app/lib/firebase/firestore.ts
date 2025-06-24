@@ -75,19 +75,20 @@ export async function addWatchlistItem(
     _watchListId: string,
     _createdBy: string,
     _createdByUsername: string | null,
-    _rating: | ''
-            | 'g'
-            | 'pg'
-            | 'pg-13'
-            | 'r'
-            | 'tv-y'
-            | 'tv-y7'
-            | 'tv-g'
-            | 'tv-pg'
-            | 'tv-14'
-            | 'tv-ma',
+    _rating:
+        | ''
+        | 'g'
+        | 'pg'
+        | 'pg-13'
+        | 'r'
+        | 'tv-y'
+        | 'tv-y7'
+        | 'tv-g'
+        | 'tv-pg'
+        | 'tv-14'
+        | 'tv-ma',
     _year: number | null = null,
-    _endYear : number | null = null,
+    _endYear: number | null = null,
     _length: number | null = null,
     _description: string | null = null,
     _imdbLink: string | null = null,
@@ -98,7 +99,6 @@ export async function addWatchlistItem(
     _trailerLink: string | null = null,
     _seasons: number | null = null,
     _episodes: number | null = null
-
 ) {
     try {
         const itemsCollectionRef = collection(
@@ -195,12 +195,12 @@ export async function getVote(
 
 export async function getUserName(userId: string) {
     const userRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userRef)
+    const userSnap = await getDoc(userRef);
 
-    if(userSnap.exists()){
+    if (userSnap.exists()) {
         return userSnap.data().username;
     } else {
-        return null
+        return null;
     }
 }
 
@@ -344,6 +344,74 @@ export async function decrementTag(watchListId: string, tag: string) {
         await updateDoc(docRef, {
             [tagKey]: increment(-1),
         });
+    }
+}
+
+export async function editItem(
+    _title: string,
+    _type: 'movie' | 'tv' | 'other',
+    watchlistId: string,
+    itemId: string,
+    _rating:
+        | ''
+        | 'g'
+        | 'pg'
+        | 'pg-13'
+        | 'r'
+        | 'tv-y'
+        | 'tv-y7'
+        | 'tv-g'
+        | 'tv-pg'
+        | 'tv-14'
+        | 'tv-ma',
+    _year: number | null = null,
+    _endYear: number | null = null,
+    _length: number | null = null,
+    _description: string | null = null,
+    _imdbLink: string | null = null,
+    _pickedGenres: string[] | null = null,
+    _pickedTags: string[] | null = null,
+    _director: string | null = null,
+    _imdbRating: number | null = null,
+    _trailerLink: string | null = null,
+    _seasons: number | null = null,
+    _episodes: number | null = null
+) {
+    const itemRef = doc(db, 'watchlists', watchlistId, 'items', itemId)
+    const snapShot = await getDoc(itemRef);
+    if (!snapShot.exists()) throw new Error("Items not found");
+    const existing = snapShot.data()
+
+    const updates:any = {}
+
+    // compares all values and stores changes in updates
+    if (_title !== existing.title) updates.title = _title;
+    if (_type !== existing.type) updates.type = _type;
+    if (_rating !== existing.rating) updates.rating = _rating;
+    if (_year !== existing.year) updates.year = _year;
+    if (_endYear !== existing.endYear) updates.endYear = _endYear;
+    if (_length !== existing.length) updates.length = _length;
+    if (_description !== existing.description) updates.description = _description;
+    if (_imdbLink !== existing.imdbLink) updates.imdbLink = _imdbLink;
+    if (_director !== existing.director) updates.director = _director;
+    if (_imdbRating !== existing.imdbRating) updates.imdbRating = _imdbRating;
+    if (_trailerLink !== existing.trailerLink) updates.trailerLink = _trailerLink;
+    if (_seasons !== existing.seasons) updates.seasons = _seasons;
+    if (_episodes !== existing.episodes) updates.episodes = _episodes;
+    // compares genres and tags with stringified for shallow comparison
+    if (JSON.stringify(_pickedGenres) !== JSON.stringify(existing.genres))
+    updates.genres = _pickedGenres;
+    if (JSON.stringify(_pickedTags) !== JSON.stringify(existing.tags))
+        updates.tags = _pickedTags;
+
+
+    try{
+        if (Object.keys(updates).length > 0) {
+            updates.updatedAt = serverTimestamp()
+            await updateDoc(itemRef, updates)
+        }
+    } catch(e){
+        console.error(e)
     }
 }
 
