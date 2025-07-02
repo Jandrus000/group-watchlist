@@ -5,7 +5,6 @@ import Modal from './Modal';
 import { useState, useMemo } from 'react';
 import Select from 'react-select';
 import { genres } from '../lib/util';
-import { Watchlist } from '../hooks/useUserWatchlist';
 import { OptionType } from '../lib/types';
 import { useWatchlist } from '../hooks/useWatchlist';
 
@@ -100,7 +99,7 @@ export default function ItemFilter({
         { label: 'TV-MA', value: 'tv-ma' },
     ];
 
-    const tagOptions: OptionType[] = loading ? [] : Object.keys(watchlist.tags).map((key) => {
+    const tagOptions: OptionType[] = loading || watchlist! ? [] : Object.keys(watchlist.tags).map((key) => {
         const tag = watchlist.tags[key];
         return {
             label: tag.name,
