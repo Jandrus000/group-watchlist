@@ -1,6 +1,6 @@
 "use client"
 
-import { Watchlist } from '../hooks/useUserWatchlist';
+import { Watchlist } from '../lib/types';
 import Image from 'next/image';
 import Modal from './Modal';
 import { useState } from 'react';

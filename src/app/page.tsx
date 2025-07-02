@@ -9,7 +9,6 @@ import WatchlistDelete from './components/WatchlistDelete';
 import Image from 'next/image';
 import { useSavedWatchlists } from './hooks/useSavedWatchlists';
 import { ToastContainer, toast } from 'react-toastify';
-import { useWatchlistItems } from './hooks/useWatchlistItems';
 import { toggleSave } from './lib/firebase/firestore';
 
 

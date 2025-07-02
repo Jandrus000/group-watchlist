@@ -1,6 +1,6 @@
 'use client';
 
-import { Items } from '../hooks/useWatchlistItems';
+import { Items } from '../lib/types';
 import styles from '../page.module.css';
 import VoteButtons from './VoteButtons';
 import ItemEdit from './ItemEdit';
