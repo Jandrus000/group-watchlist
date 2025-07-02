@@ -4,7 +4,7 @@ import TagPicker from './TagPicker';
 import { useState } from 'react';
 import { useWatchlistItems } from '../hooks/useWatchlistItems';
 import { User } from 'firebase/auth';
-import { Watchlist } from '../hooks/useUserWatchlist';
+import { Watchlist } from '../lib/types';
 import { incrementTag } from '../lib/firebase/firestore';
 
 export default function AddItemModal({
