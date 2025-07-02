@@ -165,7 +165,7 @@ service cloud.firestore {
           request.resource.data.imdbRating > 0 &&
           request.resource.data.imdbRating <= 10
           ) ||
-          request.resource.data.episodes == null
+          request.resource.data.imdbRating == null
           ) &&
           (request.resource.data.trailerLink is string || request.resource.data.trailerLink == null);
 

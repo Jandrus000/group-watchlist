@@ -1,6 +1,6 @@
 "use client"
 
-import { Items } from "../hooks/useWatchlistItems"
+import { Items } from "../lib/types"
 import { updateWatchState } from "../lib/firebase/firestore"
 import styles from '../page.module.css'
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Items } from '../hooks/useWatchlistItems';
+import { Items } from "../lib/types"
 import styles from '../page.module.css';
 import { useState, useRef } from 'react';
 import { useWatchlistItems } from '../hooks/useWatchlistItems';

@@ -2,13 +2,10 @@
 
 import {createContext, useContext} from 'react';
 import { useAuth } from '../lib/firebase/auth';
-import { User } from 'firebase/auth';
 import React from 'react';
+import { AuthContextType } from '../lib/types';
 
-type AuthContextType = {
-    user: User | null;
-    loading: boolean
-}
+
 
 const defaultAuthContext: AuthContextType = {
     user: null,

@@ -20,8 +20,7 @@ import {
     deleteField,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { Items } from '@/app/hooks/useWatchlistItems';
-import { Watchlist } from '@/app/hooks/useUserWatchlist';
+import { Items, Watchlist } from '../types';
 
 // ============== create ==============
 export async function addUser(user_name: string, userId: string) {
@@ -237,7 +236,52 @@ export function subscribeToWatchlist(
     return unsubscribe;
 }
 
+export function subscribeToSavedWatchlist(
+    userId: string,
+    onUpdate: (saved: any) => void
+) {
+    const userRef = doc(db, 'users', userId);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+        const data = docSnap.data();
+        const saved = data?.savedWatchlists || {};
+        if (docSnap.exists()) {
+            onUpdate(saved);
+        }
+    });
+
+    return unsubscribe;
+}
+
 // ============== update ==============
+export async function toggleSave(
+    userId: string,
+    watchlistId: string,
+    watchlistName: string,
+    watchlistDescription: string
+) {
+    const userRef = doc(db, 'users', userId);
+    const snapShot = await getDoc(userRef);
+    try {
+        const userData = snapShot.data();
+        const saved = userData?.savedWatchlists?.[watchlistId];
+
+        if (saved) {
+            await updateDoc(userRef, {
+                [`savedWatchlists.${watchlistId}`]: deleteField(),
+            });
+        } else {
+            await updateDoc(userRef, {
+                [`savedWatchlists.${watchlistId}`]: {
+                    name: watchlistName,
+                    description: watchlistDescription,
+                },
+            });
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 export async function handleVote(
     itemId: string,
     userId: string,
@@ -291,7 +335,6 @@ export async function updateWatchState(
     watchedState: boolean
 ) {
     const itemRef = doc(db, 'watchlists', watchListId, 'items', itemId);
-    const snapShot = await getDoc(itemRef);
     try {
         await updateDoc(itemRef, {
             watched: watchedState,
@@ -377,12 +420,12 @@ export async function editItem(
     _seasons: number | null = null,
     _episodes: number | null = null
 ) {
-    const itemRef = doc(db, 'watchlists', watchlistId, 'items', itemId)
+    const itemRef = doc(db, 'watchlists', watchlistId, 'items', itemId);
     const snapShot = await getDoc(itemRef);
-    if (!snapShot.exists()) throw new Error("Items not found");
-    const existing = snapShot.data()
+    if (!snapShot.exists()) throw new Error('Items not found');
+    const existing = snapShot.data();
 
-    const updates:any = {}
+    const updates: any = {};
 
     // compares all values and stores changes in updates
     if (_title !== existing.title) updates.title = _title;
@@ -391,27 +434,28 @@ export async function editItem(
     if (_year !== existing.year) updates.year = _year;
     if (_endYear !== existing.endYear) updates.endYear = _endYear;
     if (_length !== existing.length) updates.length = _length;
-    if (_description !== existing.description) updates.description = _description;
+    if (_description !== existing.description)
+        updates.description = _description;
     if (_imdbLink !== existing.imdbLink) updates.imdbLink = _imdbLink;
     if (_director !== existing.director) updates.director = _director;
     if (_imdbRating !== existing.imdbRating) updates.imdbRating = _imdbRating;
-    if (_trailerLink !== existing.trailerLink) updates.trailerLink = _trailerLink;
+    if (_trailerLink !== existing.trailerLink)
+        updates.trailerLink = _trailerLink;
     if (_seasons !== existing.seasons) updates.seasons = _seasons;
     if (_episodes !== existing.episodes) updates.episodes = _episodes;
     // compares genres and tags with stringified for shallow comparison
     if (JSON.stringify(_pickedGenres) !== JSON.stringify(existing.genres))
-    updates.genres = _pickedGenres;
+        updates.genres = _pickedGenres;
     if (JSON.stringify(_pickedTags) !== JSON.stringify(existing.tags))
         updates.tags = _pickedTags;
 
-
-    try{
+    try {
         if (Object.keys(updates).length > 0) {
-            updates.updatedAt = serverTimestamp()
-            await updateDoc(itemRef, updates)
+            updates.updatedAt = serverTimestamp();
+            await updateDoc(itemRef, updates);
         }
-    } catch(e){
-        console.error(e)
+    } catch (e) {
+        console.error(e);
     }
 }
 

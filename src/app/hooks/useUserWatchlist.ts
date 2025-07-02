@@ -1,16 +1,9 @@
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { addWatchlist, getUserWatchlists } from '../lib/firebase/firestore';
-import { Timestamp } from 'firebase/firestore';
+import { Watchlist } from '../lib/types';
 
-export type Watchlist = {
-    id: string;
-    name: string;
-    userId: string;
-    description: string;
-    createdAt: Timestamp;
-    tags: { tagIndex: number; name: string };
-};
+
 
 export function useUserWatchlist(user: User | null) {
     const [watchlists, setWatchlists] = useState<Watchlist[]>([]);

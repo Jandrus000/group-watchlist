@@ -1,4 +1,4 @@
-import { query, Timestamp } from 'firebase/firestore';
+import { Items } from "../lib/types"
 import { useEffect, useState } from 'react';
 import {
     addWatchlistItem,
@@ -6,44 +6,10 @@ import {
     subscribeToWatchlistItems,
     handleVote,
     editItem,
+    toggleSave,
 } from '../lib/firebase/firestore';
 
-export type Items = {
-    id: string;
-    title: string;
-    type: 'movie' | 'tv' | 'other';
-    year: number | null;
-    endYear: number | null;
-    length: number | null;
-    description: string | null;
-    imdbLink: string;
-    createdBy: string;
-    createdByUsername: string;
-    watchListId: string;
-    upVotes: number;
-    watched: boolean;
-    genres: string[] | null;
-    tags: string[] | null;
-    director: string | null;
-    rating:
-        | ''
-        | 'g'
-        | 'pg'
-        | 'pg-13'
-        | 'r'
-        | 'tv-y'
-        | 'tv-y7'
-        | 'tv-g'
-        | 'tv-pg'
-        | 'tv-14'
-        | 'tv-ma';
-    imdbRating: number | null;
-    trailerLink: string | null;
-    seasons: number | null;
-    episodes: number | null;
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
-};
+
 
 export function useWatchlistItems(watchListId: string) {
     const [items, setItems] = useState<Items[]>([]);
@@ -179,6 +145,10 @@ export function useWatchlistItems(watchListId: string) {
         await handleVote(itemId, userId, -1, watchListId);
     };
 
+    const saveWatchlist = async (userId: string, watchlistName: string, watchlistDescription: string) => {
+        await toggleSave(userId, watchListId, watchlistName, watchlistDescription)
+    };
+
     return {
         items,
         itemsLoading,
@@ -186,5 +156,6 @@ export function useWatchlistItems(watchListId: string) {
         editItem: handleEditItem,
         upVote,
         downVote,
+        saveWatchlist
     };
 }
