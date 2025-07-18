@@ -7,7 +7,7 @@ import { useWatchlistItems } from '../hooks/useWatchlistItems';
 // import GenrePicker from './GenrePicker';
 // import TagPicker from './TagPicker';
 import Select from 'react-select';
-import { genres } from '../lib/util';
+import { genres, customStyles } from '../lib/util';
 import CreatableSelect from 'react-select/creatable';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { decrementTag, incrementTag } from '../lib/firebase/firestore';
@@ -226,7 +226,7 @@ export default function ListItem({
         <div
             className={`${styles.accordianDropdown} ${
                 watched && styles.checkedItem
-            }`}
+            } item-edit`}
         >
             <label htmlFor="item-title">Title</label>
             <input
@@ -333,6 +333,8 @@ export default function ListItem({
                 <option value={'other'}>other</option>
             </select>
 
+            <label htmlFor='genre-picker'>Genres</label>
+
             <Select<OptionType, true>
                 isMulti
                 id="genre-picker"
@@ -341,13 +343,17 @@ export default function ListItem({
                 onChange={(selected) =>
                     setPickedgenres(selected as OptionType[])
                 }
+                styles={customStyles}
             />
-
+            
+            <label>Tags</label>
             <CreatableSelect
                 isMulti
                 options={tagOptions}
                 value={pickedTags}
                 onChange={(selected) => setPickedtags(selected as OptionType[])}
+                styles={customStyles}
+
             />
 
             {/* <GenrePicker
@@ -424,9 +430,11 @@ export default function ListItem({
                     return <p key={i}>{error}</p>;
                 })}
             </div>
-
-            <button onClick={handleEditItem}>Save Changes</button>
-            <button onClick={handleEditClose}>cancel</button>
+            
+            <div className='button-flex'>
+                <button onClick={handleEditItem} className='custom-button'>Save Changes</button>
+                <button onClick={handleEditClose} className='custom-button'>cancel</button>
+            </div>
         </div>
     );
 }

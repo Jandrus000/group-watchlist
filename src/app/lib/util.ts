@@ -80,12 +80,14 @@ export const genres = [
     'Zombie',
 ];
 
+// styles used for select components library
 export const customStyles = {
   control: (base: any) => ({
     ...base,
     backgroundColor: 'var(--highlighted-bg)',
     borderColor: 'var(--border-light)',
     borderRadius: '8px',
+    color: 'var(--cream-white)',
     height: '50px',
     padding: '2px',
     boxShadow: 'none',

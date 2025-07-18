@@ -59,6 +59,38 @@ h1 {
     color: var(--border-light);
 }
 
+.button-flex{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.delete{
+    background-color: var(--light-red) !important;
+}
+
+.detail-field {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.detail-field > span:first-of-type {
+    margin-top: 13px;
+    margin-bottom: 16px;
+    font-size: 1.2em;
+}
+
+.detail-field >span  {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.many-detail-container{
+    margin-top: 16px;
+}
+
 .random-pick{
     display: flex;
     align-items: center;
@@ -75,5 +107,26 @@ h1 {
     font-size: .8em;
     height: 20px;
     margin-bottom: 15px;
+}
+
+.item-edit{
+    display: flex;
+    flex-direction: column;
+}
+
+.item-edit > label {
+    margin: 20px 0 7px 0;
+}
+
+.item-edit > input, textarea, select {
+    min-width: 475px;
+    height: 50px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    color: white;
+    font-family: var(--font);
+    font-size: 1em;
+    background-color: var(--highlighted-bg);
 }
 

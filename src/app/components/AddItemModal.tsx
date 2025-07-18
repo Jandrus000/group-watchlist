@@ -1,5 +1,4 @@
 import Modal from './Modal';
-// import TagPicker from './TagPicker';
 import { useEffect, useState } from 'react';
 import { useWatchlistItems } from '../hooks/useWatchlistItems';
 import { useWatchlist } from '../hooks/useWatchlist';

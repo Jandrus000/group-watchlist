@@ -19,7 +19,6 @@ import {
     deleteDoc,
     deleteField,
 } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
 import { Items, Watchlist } from '../types';
 
 // ============== create ==============

@@ -105,28 +105,28 @@ export default function ListItem({
                         }`}
                     >
                         {item.description !== '' && (
-                            <>
+                            <div className="detail-field">
                                 <span className="bold">Description</span>
                                 <p>{item.description}</p>
-                            </>
+                            </div>
                         )}
 
                         {item.rating !== '' && (
-                            <>
+                            <div className="detail-field">
                                 <span className="bold">MPA Rating</span>
                                 <p>{item.rating}</p>
-                            </>
+                            </div>
                         )}
 
                         {item.director !== '' && (
-                            <>
+                            <div className="detail-field">
                                 <span className="bold">Director</span>
                                 <p>{item.director}</p>
-                            </>
+                            </div>
                         )}
 
                         {item.length && (
-                            <div>
+                            <div className="detail-field">
                                 <span className="bold">
                                     Length (in mintues)
                                 </span>
@@ -135,7 +135,7 @@ export default function ListItem({
                         )}
 
                         {item.year && (
-                            <div>
+                            <div className="detail-field">
                                 <span className="bold">Release Year</span>
                                 <span>
                                     {item.year}
@@ -145,14 +145,14 @@ export default function ListItem({
                         )}
 
                         {item.seasons && (
-                            <div>
+                            <div className="detail-field">
                                 <span className="bold">Seasons</span>
                                 <span>{item.seasons}</span>
                             </div>
                         )}
 
                         {item.episodes && (
-                            <div>
+                            <div className="detail-field">
                                 <span className="bold">
                                     Episodes per season
                                 </span>
@@ -161,58 +161,57 @@ export default function ListItem({
                         )}
 
                         {item.genres && item.genres.length > 0 && (
-                            <>
+                            <div className='detail-field'>
                                 <span className="bold">Genre</span>
-                                {item.genres?.map(
-                                    (genre: string, i: number) => (
-                                        <span key={i}>
-                                            <br />
-                                            {genre}
-                                        </span>
-                                    )
-                                )}
-                            </>
+                                <div className='many-detail-container'>
+                                    {item.genres?.map(
+                                        (genre: string, i: number) => (
+                                            <span key={i}>
+                                                {genre}{i !== item.genres?.length -1 ? ', ' : ''}
+                                            </span>
+                                        )
+                                    )}
+                                </div>
+                            </div>
                         )}
 
                         {item.tags && item.tags.length > 0 && (
-                            <>
+                            <div className='detail-field'>
                                 <span className="bold">Tags</span>
-                                {item.tags?.map((tag: string, i: number) => (
-                                    <span key={i}>
-                                        <br />
-                                        {tag}
-                                    </span>
-                                ))}
-                            </>
+                                <div className='many-detail-container'>
+                                    {item.tags?.map((tag: string, i: number) => (
+                                        <span className='list-detail' key={i}>
+                                            {tag}{i !== item.tags?.length -1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
                         )}
 
                         {item.imdbRating && (
-                            <div>
+                            <div className="detail-field">
                                 <span className="bold">Imdb Rating</span>
                                 <span>{item.imdbRating}/10</span>
                             </div>
                         )}
 
-                        {item.imdbLink !== '' && (
-                            <div>
-                                <a href={item.imdbLink} target="_blank">
-                                    <Image
-                                        src={'/imdb-svgrepo-com.svg'}
-                                        alt="IMDB link"
-                                        width={25}
-                                        height={50}
-                                    />
-                                </a>
-                            </div>
-                        )}
 
-                        {item.trailerLink !== '' &&
-                            item.trailerLink !== null && (
+                        <div className="detail-field">
+                            <span className="bold">Added</span>
+                            <span>{formatDate(item.createdAt)}</span>
+                        </div>
+
+                        <div className="detail-field">
+                            <span className="bold">Added by</span>
+                            <span>{username || `User ${item.createdBy}`}</span>
+                        </div>
+                        <div className='detail-field'>
+                            {item.imdbLink !== '' && (
                                 <div>
-                                    <a href={item.trailerLink} target="_blank">
+                                    <a href={item.imdbLink} target="_blank">
                                         <Image
-                                            src={'/video-file.svg'}
-                                            alt="Trailer link"
+                                            src={'/imdb-svgrepo-com.svg'}
+                                            alt="IMDB link"
                                             width={25}
                                             height={50}
                                         />
@@ -220,22 +219,37 @@ export default function ListItem({
                                 </div>
                             )}
 
-                        <div>
-                            <span className="bold">Added</span>
-                            <span>{formatDate(item.createdAt)}</span>
+                            {item.trailerLink !== '' &&
+                                item.trailerLink !== null && (
+                                    <div>
+                                        <a href={item.trailerLink} target="_blank">
+                                            <Image
+                                                src={'/video-file.svg'}
+                                                alt="Trailer link"
+                                                width={25}
+                                                height={50}
+                                            />
+                                        </a>
+                                    </div>
+                                )}
                         </div>
 
-                        <div>
-                            <span className="bold">Added by</span>
-                            <span>{username || `User ${item.createdBy}`}</span>
-                        </div>
-
-                        <button onClick={handleDelete}>Delete</button>
-                        {!watched && (
-                            <button onClick={() => setIsEditMode(true)}>
-                                Edit
+                        <div className="button-flex">
+                            <button
+                                onClick={handleDelete}
+                                className="custom-button delete"
+                            >
+                                Delete
                             </button>
-                        )}
+                            {!watched && (
+                                <button
+                                    className="custom-button"
+                                    onClick={() => setIsEditMode(true)}
+                                >
+                                    Edit
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ))}
         </div>
