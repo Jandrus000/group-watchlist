@@ -125,7 +125,7 @@ export const customStyles = {
     backgroundColor: state.isFocused
       ? 'var(--border-light)'
       : 'transparent',
-    color: 'var(--text-color)',
+    color: 'var(--cream-white)',
     cursor: 'pointer'
   }),
   input: (base: any) => ({
