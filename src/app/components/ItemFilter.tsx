@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Modal from './Modal';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Select from 'react-select';
 import { genres, customStyles } from '../lib/util';
 import { OptionType } from '../lib/types';
@@ -73,6 +73,7 @@ export default function ItemFilter({
 }) {
     const [modalOpen, setModalOpen] = useState(false);
     const { watchlist, loading } = useWatchlist(watchlistId);
+    const [tagOptions, setTagOptions] = useState<OptionType[]>([]);
 
     const genreOptions: OptionType[] = genres.map((g) => ({
         label: g,
@@ -98,16 +99,28 @@ export default function ItemFilter({
         { label: 'TV-MA', value: 'tv-ma' },
     ];
 
-    const tagOptions: OptionType[] =
-        loading || watchlist!
-            ? []
-            : Object.keys(watchlist.tags).map((key) => {
-                  const tag = watchlist.tags[key];
-                  return {
-                      label: tag.name,
-                      value: key,
-                  };
-              });
+    useEffect(() => {
+        if (!loading && watchlist.tags) {
+            setTagOptions([
+                ...Object.keys(watchlist.tags).map((key: string) => ({
+                    label: watchlist['tags'][key]['name'],
+                    value: watchlist['tags'][key]['name'],
+                })),
+            ]);
+            // console.log(tagOptions);
+        }
+    }, [loading, watchlist]);
+
+    // const tagOptions: OptionType[] =
+    //     loading || watchlist!
+    //         ? []
+    //         : Object.keys(watchlist.tags).map((key) => {
+    //               const tag = watchlist.tags[key];
+    //               return {
+    //                   label: tag.name,
+    //                   value: key,
+    //               };
+    //           });
 
     return (
         <>
