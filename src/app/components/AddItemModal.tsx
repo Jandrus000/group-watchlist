@@ -63,7 +63,7 @@ export default function AddItemModal({
     const [trailerLink, setTrailerLink] = useState('');
 
     useEffect(() => {
-        if (!loading) {
+        if (!loading && watchlist.tags) {
             setTagOptions([
                 ...Object.keys(watchlist.tags).map((key: string) => ({
                     label: watchlist['tags'][key]['name'],
