@@ -19,10 +19,10 @@ export function useUserWatchlist(user: User | null) {
         fetchData();
     }, [user]);
 
-    const handleAddWatchlist = async (name: string, description: string) => {
+    const handleAddWatchlist = async (name: string, description: string, type: "public" | "private") => {
         if (!user) return;
 
-        await addWatchlist(name, user.uid, description);
+        await addWatchlist(name, user.uid, description, type);
 
         const data = await getUserWatchlists(user);
         setWatchlists(data as Watchlist[]);

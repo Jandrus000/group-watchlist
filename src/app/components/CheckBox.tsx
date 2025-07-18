@@ -2,7 +2,7 @@
 
 import { Items } from "../lib/types"
 import { updateWatchState } from "../lib/firebase/firestore"
-import styles from '../page.module.css'
+import styles from '../styles/page.module.css'
 
 export default function CheckBox({ watched, item }: { watched: boolean , item: Items}) {
     

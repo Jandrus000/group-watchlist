@@ -1,11 +1,15 @@
 'use client';
 
-import { Items } from "../lib/types"
-import styles from '../page.module.css';
-import { useState, useRef } from 'react';
+import { Items, OptionType } from '../lib/types';
+import styles from '../styles/page.module.css';
+import { useState, useRef, useEffect } from 'react';
 import { useWatchlistItems } from '../hooks/useWatchlistItems';
-import GenrePicker from './GenrePicker';
-import TagPicker from './TagPicker';
+// import GenrePicker from './GenrePicker';
+// import TagPicker from './TagPicker';
+import Select from 'react-select';
+import { genres } from '../lib/util';
+import CreatableSelect from 'react-select/creatable';
+import { useWatchlist } from '../hooks/useWatchlist';
 import { decrementTag, incrementTag } from '../lib/firebase/firestore';
 import { User } from 'firebase/auth';
 
@@ -20,28 +24,44 @@ export default function ListItem({
     watched: boolean;
     user: User | null;
 }) {
+    const { watchlist, loading } = useWatchlist(item.watchListId);
+
+    const genreOptions: OptionType[] = genres.map((g) => ({
+        label: g,
+        value: g,
+    }));
+    const [tagOptions, setTagOptions] = useState<OptionType[]>([]);
+
     const { editItem } = useWatchlistItems(item.watchListId);
     const [errors, setErrors] = useState<string[]>([]);
 
     const [itemTitle, setItemTitle] = useState(item.title);
-    const [itemYear, setItemYear] = useState((item.year && String(item.year)) || '');
+    const [itemYear, setItemYear] = useState(
+        (item.year && String(item.year)) || ''
+    );
     const [itemDescription, setItemDescription] = useState(
         item.description || ''
     );
     const [imdbLink, setImdbLink] = useState(item.imdbLink || '');
-    const [itemLength, setitemLength] = useState((item.length && String(item.length)) || '');
+    const [itemLength, setitemLength] = useState(
+        (item.length && String(item.length)) || ''
+    );
     const [itemType, setItemType] = useState<'movie' | 'tv' | 'other'>(
         item.type || 'movie'
     );
-    const [pickedGenres, setPickedgenres] = useState<string[]>(
-        item.genres || []
+    const [pickedGenres, setPickedgenres] = useState<OptionType[]>(
+        item.genres?.map((item: string) => ({ value: item, label: item })) || []
     );
     const originalTags = useRef<string[]>(item.tags || []);
-    const [pickedTags, setPickedtags] = useState<string[]>(item.tags || []);
+    const [pickedTags, setPickedtags] = useState<OptionType[]>(
+        item.tags?.map((item: string) => ({ value: item, label: item })) || []
+    );
     const [itemDirector, setItemDirector] = useState(item.director || '');
-    const [itemSeasons, setItemSeasons] = useState((item.seasons && String(item.seasons)) || '');
+    const [itemSeasons, setItemSeasons] = useState(
+        (item.seasons && String(item.seasons)) || ''
+    );
     const [itemEpisodes, setItemEpisodes] = useState(
-        (item.episodes&& String(item.episodes)) || ''
+        (item.episodes && String(item.episodes)) || ''
     );
     const [itemRating, setItemRating] = useState<
         | ''
@@ -56,11 +76,26 @@ export default function ListItem({
         | 'tv-14'
         | 'tv-ma'
     >(item.rating || '');
-    const [itemEndYear, setItemEndYear] = useState((item.endYear && String(item.endYear)) || '');
+    const [itemEndYear, setItemEndYear] = useState(
+        (item.endYear && String(item.endYear)) || ''
+    );
     const [imdbItemRating, setImdbRating] = useState(
         (item.imdbRating && String(item.imdbRating)) || ''
     );
     const [trailerLink, setTrailerLink] = useState(item.trailerLink || '');
+
+    useEffect(() => {
+        if (!loading) {
+            setTagOptions([
+                ...Object.keys(watchlist.tags).map((key: string) => ({
+                    label: watchlist['tags'][key]['name'],
+                    value: watchlist['tags'][key]['name'],
+                })),
+                ...pickedTags,
+            ]);
+            // console.log(tagOptions);
+        }
+    }, [loading, watchlist, item, pickedTags]);
 
     function handleEditClose() {
         // todo possible error, items wont change on database on time to show correct values after reopening
@@ -71,11 +106,19 @@ export default function ListItem({
         setImdbLink(item.imdbLink || '');
         setitemLength((item.length && String(item.length)) || '');
         setErrors([]);
-        setPickedgenres(item.genres || []);
-        setPickedtags(item.tags || []);
+        setPickedgenres(
+            item.genres?.map((item: string) => ({
+                value: item,
+                label: item,
+            })) || []
+        );
+        setPickedtags(
+            item.tags?.map((item: string) => ({ value: item, label: item })) ||
+                []
+        );
         setItemDirector(item.director || '');
         setItemSeasons((item.seasons && String(item.seasons)) || '');
-        setItemEpisodes((item.episodes&& String(item.episodes)) || '');
+        setItemEpisodes((item.episodes && String(item.episodes)) || '');
         setItemRating(item.rating || '');
         setItemEndYear((item.endYear && String(item.endYear)) || '');
         setImdbRating((item.imdbRating && String(item.imdbRating)) || '');
@@ -83,8 +126,9 @@ export default function ListItem({
     }
 
     async function handleEditItem() {
-        console.log("working on it")
         setErrors([]);
+        let genres: string[] = [];
+        let tags: string[] = [];
         let year = null;
         let length = null;
         let endYear = null;
@@ -135,6 +179,15 @@ export default function ListItem({
             seasons = null;
             episodes = null;
         }
+
+        if (pickedGenres.length >= 1) {
+            genres = pickedGenres.map((item: OptionType) => item.value);
+        }
+
+        if (pickedTags.length >= 1) {
+            tags = pickedTags.map((item: OptionType) => item.value);
+        }
+
         if (user?.uid) {
             editItem(
                 itemTitle,
@@ -146,8 +199,8 @@ export default function ListItem({
                 length,
                 itemDescription,
                 imdbLink,
-                pickedGenres,
-                pickedTags,
+                genres,
+                tags,
                 itemDirector,
                 itemRating,
                 imdbRating,
@@ -155,16 +208,15 @@ export default function ListItem({
                 seasons,
                 episodes
             );
-            const tags = pickedTags;
-            const addedTags = pickedTags.filter(
+            const addedTags = tags.filter(
                 (tag) => !originalTags.current.includes(tag)
             );
             const removedTags = originalTags.current.filter(
-                (tag) => !pickedTags.includes(tag)
+                (tag) => !tags.includes(tag)
             );
             handleEditClose();
-            addedTags.forEach(tag => incrementTag(item.watchListId, tag))
-            removedTags.forEach(tag => decrementTag(item.watchListId, tag))
+            addedTags.forEach((tag) => incrementTag(item.watchListId, tag));
+            removedTags.forEach((tag) => decrementTag(item.watchListId, tag));
         } else {
             setErrors([...errors, 'You need to be signed in']);
         }
@@ -281,7 +333,24 @@ export default function ListItem({
                 <option value={'other'}>other</option>
             </select>
 
-            <GenrePicker
+            <Select<OptionType, true>
+                isMulti
+                id="genre-picker"
+                options={genreOptions}
+                value={pickedGenres}
+                onChange={(selected) =>
+                    setPickedgenres(selected as OptionType[])
+                }
+            />
+
+            <CreatableSelect
+                isMulti
+                options={tagOptions}
+                value={pickedTags}
+                onChange={(selected) => setPickedtags(selected as OptionType[])}
+            />
+
+            {/* <GenrePicker
                 pickedGenres={pickedGenres}
                 setPickedgenres={setPickedgenres}
             />
@@ -290,7 +359,7 @@ export default function ListItem({
                 pickedTags={pickedTags}
                 setPickedtags={setPickedtags}
                 watchlistId={item.watchListId}
-            />
+            /> */}
 
             <label htmlFor="item-year">Release year</label>
             <input

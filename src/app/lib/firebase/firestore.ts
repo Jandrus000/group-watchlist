@@ -53,7 +53,8 @@ export async function addUserGoogle(user_name: string | null, userId: string) {
 export async function addWatchlist(
     _name: string,
     _userId: string,
-    _description: string
+    _description: string,
+    _type: "public" | "private"
 ) {
     try {
         await addDoc(collection(db, 'watchlists'), {
@@ -61,6 +62,7 @@ export async function addWatchlist(
             userId: _userId,
             description: _description,
             tags: {},
+            private: (_type === "private"),
             createdAt: serverTimestamp(),
         });
     } catch (e) {
@@ -369,25 +371,26 @@ export async function incrementTag(watchListId: string, tag: string) {
 
 export async function decrementTag(watchListId: string, tag: string) {
     const tagKey = `tags.${tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_')}`;
-
     const docRef = doc(db, 'watchlists', watchListId);
-    const snap = await getDoc(docRef);
 
-    if (!snap.exists()) return;
+    await runTransaction(db, async (transaction) => {
+        const snap = await transaction.get(docRef);
+        if (!snap.exists()) return;
 
-    const data = snap.data();
-    const currentCount =
-        data.tags?.[tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_')].count ?? 0;
+        const data = snap.data();
+        const tagData = data.tags?.[tag.toLowerCase().replace(/[^a-z0-9_]/gi, '_')];
+        const currentCount = tagData?.count ?? 0;
 
-    if (currentCount <= 1) {
-        await updateDoc(docRef, {
-            [tagKey]: deleteField(),
-        });
-    } else {
-        await updateDoc(docRef, {
-            [tagKey]: increment(-1),
-        });
-    }
+        if (currentCount <= 1) {
+            transaction.update(docRef, {
+                [tagKey]: deleteField(),
+            });
+        } else {
+            transaction.update(docRef, {
+                [tagKey + '.count']: increment(-1),
+            });
+        }
+    });
 }
 
 export async function editItem(

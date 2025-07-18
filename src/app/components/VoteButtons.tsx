@@ -3,7 +3,7 @@
 import { useAuthContext } from '../context/AuthContext';
 import { use, useEffect, useState } from 'react';
 import { getVote } from '../lib/firebase/firestore';
-import styles from '../page.module.css';
+import styles from '../styles/page.module.css';
 
 export default function VoteButtons({
     item,
@@ -54,7 +54,7 @@ export default function VoteButtons({
             >
                 ↑
             </button>
-            <span className={styles.voteCounter}>{item.upVotes}</span>
+            <span className={styles.voteCounter}>{item.upVotes === 0 ? '-' : item.upVotes}</span>
             <button
                 className={userVote === -1 ? styles.downVoted : ''}
                 onClick={() => handleVote(-1)}

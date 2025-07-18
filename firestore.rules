@@ -26,22 +26,26 @@ service cloud.firestore {
       request.resource.data.name.size() <= 100 &&
       request.resource.data.description is string &&
       request.resource.data.description.size() <= 500 &&
+      request.resource.data.description.size() <= 500 &&
       request.resource.data.createdAt == request.time &&
-      request.resource.data.keys().hasOnly(['name', 'description', 'userId', 'createdAt', 'tags']);
+      (request.resource.data.private == null || request.resource.data.private is bool) &&
+      request.resource.data.keys().hasOnly(['name', 'description', 'userId', 'createdAt', 'tags', 'private']);
 
       allow read: if true;
 
-      allow update: if (
+      allow update: if ((
       request.auth.uid == resource.data.userId &&
       request.resource.data.name.size() <= 100 &&
       request.resource.data.description.size() <= 500 &&
       request.resource.data.userId == resource.data.userId &&
       request.resource.data.createdAt == resource.data.createdAt
-      ) || (
-      request.resource.data.keys().hasOnly(['tags']) && 
-      request.resource.data.tags is map &&
+      ) || 
+      (
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tags']) &&
       request.auth != null
-      );
+      ))
+      && 
+      (!resource.data.private || request.auth.uid == resource.data.userId);
 
       allow delete: if request.auth.uid == resource.data.userId;
 

@@ -7,6 +7,7 @@ export type Watchlist = {
     userId: string;
     description: string;
     createdAt: Timestamp;
+    private: boolean | null;
     tags: {[key: string]:{ tagIndex: number; name: string }};
 };
 

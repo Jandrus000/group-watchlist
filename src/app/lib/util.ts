@@ -80,6 +80,66 @@ export const genres = [
     'Zombie',
 ];
 
+export const customStyles = {
+  control: (base: any) => ({
+    ...base,
+    backgroundColor: 'var(--highlighted-bg)',
+    borderColor: 'var(--border-light)',
+    borderRadius: '8px',
+    height: '50px',
+    padding: '2px',
+    boxShadow: 'none',
+    '&:hover': {
+      borderColor: 'var(--text-color)'
+    }
+  }),
+  multiValue: (base: any) => ({
+    ...base,
+    backgroundColor: 'var(--border-light)',
+    borderRadius: '6px',
+    padding: '2px',
+  }),
+  multiValueLabel: (base: any) => ({
+    ...base,
+    color: 'var(--text-color)',
+    fontWeight: 500
+  }),
+  multiValueRemove: (base: any) => ({
+    ...base,
+    color: 'var(--text-color)',
+    cursor: 'pointer',
+    ':hover': {
+      backgroundColor: 'var(--text-color)',
+      color: 'white'
+    }
+  }),
+  menu: (base: any) => ({
+    ...base,
+    backgroundColor: 'var(--highlighted-bg)',
+    zIndex: 99
+  }),
+  option: (base: any, state: any) => ({
+    ...base,
+    backgroundColor: state.isFocused
+      ? 'var(--border-light)'
+      : 'transparent',
+    color: 'var(--text-color)',
+    cursor: 'pointer'
+  }),
+  input: (base: any) => ({
+    ...base,
+    color: 'var(--text-color)'
+  }),
+  placeholder: (base: any) => ({
+    ...base,
+    color: 'var(--border-light)'
+  }),
+  singleValue: (base: any) => ({
+    ...base,
+    color: 'var(--text-color)'
+  })
+}
+
 // todo refactor code to not repeat (use helper functions)
 export function applyFilter(
     list: Items[],

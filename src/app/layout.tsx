@@ -2,7 +2,7 @@
 
 import Footer from './components/Footer';
 import Header from './components/Header';
-import './globals.css';
+import './styles/globals.css';
 import {ReactNode, createContext} from 'react';
 import { AuthProvider } from './context/AuthContext';
 
@@ -25,7 +25,7 @@ export default function RootLayout({children}:{children: ReactNode}) {
 
           {children}
 
-          <Footer/>
+          {/* <Footer/> */}
         </AuthProvider>
       </body>
     </html>

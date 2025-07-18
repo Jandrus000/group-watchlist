@@ -1,0 +1,186 @@
+.mainWatchlistContent {
+    max-width: 1000px;
+    margin: 0 auto 50px auto;
+}
+
+.titleHeader{
+    margin-top: 50px;
+}
+
+.addButton {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.addButton > button {
+    font-weight: bold;
+    padding: 10px;
+    height: 40px;
+    width: 40px;
+    border-radius: 250px;
+    border: 2px solid var(--cream-white);
+    width: 25px;
+    height: 25px;
+    box-sizing: content-box;
+}
+
+.addButton > span {
+    font-size: xx-large;
+    margin-left: 15px;
+}
+
+.watchlistItems {
+    max-width: 800px;
+    height: 50px;
+    margin: auto;
+}
+
+.upVoted {
+    background-color: green;
+}
+
+.downVoted {
+    background-color: var(--light-red);
+}
+
+.votebuttons {
+    display: inline;
+    margin: 0 10px 0 10px;
+}
+
+.votebuttons > button {
+    display: inline;
+    margin: 0 10px 0 10px;
+    padding: 5px;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+}
+
+.watchlistItem {
+    display: flex;
+    gap: 15px;
+    padding: 10px;
+    align-items: center;
+    margin: 15px 0 15px 0;
+    max-width: 100%;
+    border: solid;
+    border-color: transparent;
+    border-width: 2px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.watchlistItem:hover {
+    border-color: rgb(173, 173, 173);
+}
+
+.checkedItem {
+    color: rgb(156, 156, 156);
+}
+
+.watchlistTitle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.voteCounter {
+    width: 25px;
+    text-align: center;
+    display: inline-block;
+}
+
+.accordianDropdown {
+    margin-left: 35px;
+    height: auto;
+    color: rgb(90, 90, 90);
+}
+
+.watchlistCard {
+    display: flex;
+    flex-direction: column;
+    background: var(--dropdown-bg);
+    justify-content: flex-start;
+    border: var(--border-light) solid 2px;
+    border-radius: 10px;
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.274);
+    padding: 25px;
+    width: 100%;
+    height: 200px;
+    transition: all;
+    transition-duration: 100ms;
+    cursor: pointer;
+}
+
+.watchlistCard p {
+    color: var(--border-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;        
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.watchlistCard h4 {
+  margin: 0;
+  font-size: 1.25em;
+}
+
+.watchlistCardFlex {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.watchlistGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.signInForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.signInForm > label {
+    margin: 20px 0 7px 0;
+}
+
+.signInForm > input {
+    min-width: 475px;
+    height: 50px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    color: white;
+    font-family: var(--font);
+    font-size: 1em;
+    background-color: var(--highlighted-bg);
+}
+
+.signInForm > input:focus {
+    border: 1px solid var(--cream-white);
+    outline: var(--cream-white);
+}
+
+
+/* medium */
+@media only screen and (max-width: 1440px) {
+}
+
+/* small */
+@media only screen and (max-width: 600px) {
+    .signInForm > input {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* very small */
+@media only screen and (max-width: 344px) {
+}

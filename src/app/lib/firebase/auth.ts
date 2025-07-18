@@ -46,7 +46,8 @@ export async function signUp(email: string, password: string, username: string) 
         })
         addUser(username,userCredential.user.uid)
         return userCredential.user
-    } catch (error) {
+    } catch (error: any) {
+        console.error("Signup error:", error.code, error.message);
         return error
     }
 }
