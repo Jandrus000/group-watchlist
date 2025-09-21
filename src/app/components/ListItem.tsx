@@ -160,14 +160,14 @@ export default function ListItem({
                             </div>
                         )}
 
-                        {item.genres && item.genres.length > 0 && (
+                        {Array.isArray(item.genres) && item.genres.length > 0 && (
                             <div className='detail-field'>
                                 <span className="bold">Genre</span>
                                 <div className='many-detail-container'>
                                     {item.genres?.map(
                                         (genre: string, i: number) => (
                                             <span key={i}>
-                                                {genre}{i !== item.genres?.length -1 ? ', ' : ''}
+                                                {genre}{i !== (item.genres as string[]).length -1 ? ', ' : ''}
                                             </span>
                                         )
                                     )}
@@ -181,7 +181,7 @@ export default function ListItem({
                                 <div className='many-detail-container'>
                                     {item.tags?.map((tag: string, i: number) => (
                                         <span className='list-detail' key={i}>
-                                            {tag}{i !== item.tags?.length -1 ? ', ' : ''}
+                                            {tag}{i !== (item.tags as string[]).length -1 ? ', ' : ''}
                                         </span>
                                     ))}
                                 </div>
