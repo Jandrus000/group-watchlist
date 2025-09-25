@@ -1,8 +1,9 @@
-.mainWatchlistContent {
+/* made <main> be what does stretch content*/
+/* .mainWatchlistContent {
     display: block;
     max-width: 1000px;
     margin: 0 auto 50px auto;
-}
+} */
 
 .titleHeader{
     margin-top: 50px;

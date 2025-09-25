@@ -207,7 +207,7 @@ export default function WatchlistPage({ watchlist }: { watchlist: Watchlist }) {
     }
 
     return (
-        <div className={styles.mainWatchlistContent}>
+        <div>
             <ToastContainer
                 position="top-center"
                 autoClose={5000}

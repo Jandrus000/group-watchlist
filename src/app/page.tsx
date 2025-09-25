@@ -55,7 +55,7 @@ export default function Home() {
     // console.log(watchlists)
 
     return (
-        <div className={styles.mainWatchlistContent}>
+        <div>
             <ToastContainer
                 position="top-center"
                 autoClose={5000}

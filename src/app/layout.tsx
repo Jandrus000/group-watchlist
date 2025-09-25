@@ -22,10 +22,11 @@ export default function RootLayout({children}:{children: ReactNode}) {
       <body>
         <AuthProvider>
           <Header/>
+          <main>
+            {children}  
+          </main>
 
-          {children}
-
-          {/* <Footer/> */}
+          <Footer/>
         </AuthProvider>
       </body>
     </html>

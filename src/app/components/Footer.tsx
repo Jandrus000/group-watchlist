@@ -1,12 +1,14 @@
 "use client"
 
+import Link from "next/link"
+
 export default function Footer(){
     return (
         <footer>
           <ul>
-            <li><a href="">Report an Issue</a></li>
-            <li><a href="">About Me</a></li>
-            <li><a href="">About GroupWatchlist</a></li>
+            <li><Link href="/">Home</Link></li>
+
+            <li><a href="/about">About</a></li>
           </ul>
         </footer>
     )
