@@ -12,7 +12,7 @@ export default function Home() {
                     <iframe
                         width="560"
                         height="315"
-                        src="https://www.youtube.com/embed/VoJeKngETFE?si=5QDx0QJkzgg3WP6j"
+                        src="https://www.youtube.com/embed/g8zLvdWNVqU?si=IAYRBAKoNUpZVqR6"
                         title="YouTube video player"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -21,11 +21,12 @@ export default function Home() {
                     ></iframe>
                 </div>
                 <p>
-                    Hi, I’m Jaron 😁. I built <strong>GroupWatchlist</strong> as my
-                    senior project to sharpen my skills as a
+                    Hi, I’m Jaron 😁. I built <strong>GroupWatchlist</strong> as
+                    my senior project to sharpen my skills as a
                     developer—especially working with React and building a
-                    backend with Firebase. It’s also a tool I use personally with family and
-                    friends to decide what movie to watch together.
+                    backend with Firebase. It’s also a tool I use personally
+                    with family and friends to decide what movie to watch
+                    together.
                 </p>
                 <p>With GroupWatchlist you can:</p>
                 <ul>
@@ -38,17 +39,6 @@ export default function Home() {
                     <li>Randomly select an item</li>
                     <li>Check off items you’ve watched</li>
                     <li>Make a list private when needed</li>
-
-                    {/* <li>Sign-in</li>
-                    <li>Create a watchlist</li>
-                    <li>Add item to a watchlist</li>
-                    <li>Share a watchlist</li>
-                    <li>Vote on items</li>
-                    <li>filter list</li>
-                    <li>sort a list</li>
-                    <li>randomly select an item</li>
-                    <li>check off an item</li>
-                    <li>make a private list</li> */}
                 </ul>
                 <p>
                     The project is a work in progress, and I’m planning several
